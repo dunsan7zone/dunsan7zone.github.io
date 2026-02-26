@@ -11160,3 +11160,11 @@ footer a:hover, footer a:active, footer a:focus {
     max-width: 17rem;
   }
 }
+
+.page-section {
+  display: none;
+}
+
+.page-section.active {
+  display: block;
+}
