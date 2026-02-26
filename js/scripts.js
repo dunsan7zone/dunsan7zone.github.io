@@ -37,17 +37,20 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3) Collapse responsive navbar when a tab is selected (mobile)
+    const navbarCollapseEl = document.querySelector('#navbarResponsive');
     const navbarToggler = document.body.querySelector('.navbar-toggler');
-    const clickableItems = [].slice.call(
-        document.querySelectorAll('#navbarResponsive .nav-link, #mainNav .navbar-brand')
-    );
 
-    clickableItems.forEach((item) => {
-        item.addEventListener('click', () => {
-            if (!navbarToggler) return;
-            if (window.getComputedStyle(navbarToggler).display !== 'none') {
-                navbarToggler.click();
-            }
-        });
+    const shouldCollapse = () => {
+        return navbarToggler && window.getComputedStyle(navbarToggler).display !== 'none';
+    };
+
+    const hideNavbar = () => {
+        if (!navbarCollapseEl || !shouldCollapse() || !window.bootstrap?.Collapse) return;
+        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(navbarCollapseEl, { toggle: false });
+        bsCollapse.hide();
+    };
+
+    document.querySelectorAll('#mainNav a[data-bs-toggle="tab"], #mainNav .navbar-brand').forEach((item) => {
+        item.addEventListener('click', hideNavbar);
     });
 });
