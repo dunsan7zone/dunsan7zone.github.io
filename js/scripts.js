@@ -4,31 +4,50 @@
 * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-new-age/blob/master/LICENSE)
 */
 //
-// Scripts
-// 
+// Tabs (instead of scroll/rolling)
+//
 
-window.addEventListener('DOMContentLoaded', event => {
+window.addEventListener('DOMContentLoaded', () => {
+    // 1) Activate tab from URL hash on first load
+    const hash = window.location.hash;
+    const tabSelector = (h) => `#mainNav a[data-bs-toggle="tab"][href="${h}"]`;
 
-    // Activate Bootstrap scrollspy on the main nav element
-    const mainNav = document.body.querySelector('#mainNav');
-    if (mainNav) {
-        new bootstrap.ScrollSpy(document.body, {
-            target: '#mainNav',
-            offset: 74,
-        });
+    const showTabByHash = (h) => {
+        const trigger = document.querySelector(tabSelector(h));
+        if (trigger) {
+            bootstrap.Tab.getOrCreateInstance(trigger).show();
+            return true;
+        }
+        return false;
     };
 
-    // Collapse responsive navbar when toggler is visible
+    if (!hash || !showTabByHash(hash)) {
+        // Default to Home tab
+        showTabByHash('#home');
+    }
+
+    // 2) Keep URL hash in sync when user changes tabs
+    document.querySelectorAll('#mainNav a[data-bs-toggle="tab"]').forEach((el) => {
+        el.addEventListener('shown.bs.tab', (e) => {
+            const href = e.target.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                history.replaceState(null, '', href);
+            }
+        });
+    });
+
+    // 3) Collapse responsive navbar when a tab is selected (mobile)
     const navbarToggler = document.body.querySelector('.navbar-toggler');
-    const responsiveNavItems = [].slice.call(
-        document.querySelectorAll('#navbarResponsive .nav-link')
+    const clickableItems = [].slice.call(
+        document.querySelectorAll('#navbarResponsive .nav-link, #mainNav .navbar-brand')
     );
-    responsiveNavItems.map(function (responsiveNavItem) {
-        responsiveNavItem.addEventListener('click', () => {
+
+    clickableItems.forEach((item) => {
+        item.addEventListener('click', () => {
+            if (!navbarToggler) return;
             if (window.getComputedStyle(navbarToggler).display !== 'none') {
                 navbarToggler.click();
             }
         });
     });
-
 });
