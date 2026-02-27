@@ -194,6 +194,24 @@ dl {
   margin-top: 0;
   margin-bottom: 1rem;
 }
+/* custom overrides for masthead fade carousel to eliminate horizontal shift */
+.carousel-fade .carousel-item {
+  transition: opacity .6s ease;
+  transform: none !important;
+}
+.carousel-fade .carousel-item-next,
+.carousel-fade .carousel-item-prev {
+  opacity: 0;
+  transform: none !important;
+}
+.carousel-fade .carousel-item.active {
+  opacity: 1;
+}
+
+/* ensure sections are not hidden under fixed header (desktop & mobile) */
+.page-section {
+  scroll-margin-top: 74px; /* adjust to nav height; works on all screen sizes */
+}
 
 ol ol,
 ul ul,
@@ -10859,8 +10877,8 @@ section {
 }
 
 #mainNav {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 2px;
+  padding-bottom: 2px;
   background-color: #fff;
 }
 #mainNav .navbar-brand {

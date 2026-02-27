@@ -52,7 +52,7 @@ window.addEventListener('DOMContentLoaded', event => {
       e.preventDefault();
       const link = item.querySelector('.nav-link');
       if (link) {
-        const targetId = link.textContent.trim().toLowerCase();
+        const targetId = link.getAttribute('data-val');
         showSection(targetId);
       }
     });
@@ -66,4 +66,13 @@ window.addEventListener('DOMContentLoaded', event => {
     });
   }
   showSection('home');
+
+  // initialize masthead carousel if present (auto sliding)
+  const carouselEl = document.getElementById('mastheadCarousel');
+  if (carouselEl) {
+      new bootstrap.Carousel(carouselEl, {
+          interval: 3000,    // change slide every 3 seconds
+          ride: 'carousel'
+      });
+  }
 });
