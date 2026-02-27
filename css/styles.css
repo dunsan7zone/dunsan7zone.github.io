@@ -229,6 +229,22 @@ dl {
   }
 }
 
+/* ensure smaller devices also get horizontal menu */
+@media (max-width: 768px) {
+  #navbarResponsive .navbar-nav {
+    flex-direction: row !important;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  #navbarResponsive .nav-item {
+    flex: 0 0 auto;
+  }
+  #navbarResponsive .nav-link {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
 /* nav link hover/active background applied only to icon images */
 #navbarResponsive .nav-link img {
   transition: background-color .2s;
