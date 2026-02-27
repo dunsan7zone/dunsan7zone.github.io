@@ -213,6 +213,37 @@ dl {
   scroll-margin-top: 74px; /* adjust to nav height; works on all screen sizes */
 }
 
+/* mobile collapse menu should scroll horizontally instead of vertical stack */
+@media (max-width: 991.98px) {
+  #navbarResponsive .navbar-nav {
+    flex-direction: row !important;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  #navbarResponsive .nav-item {
+    flex: 0 0 auto;
+  }
+  #navbarResponsive .nav-link {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* nav link hover/active background applied only to icon images */
+#navbarResponsive .nav-link img {
+  transition: background-color .2s;
+}
+#navbarResponsive .nav-link:hover img,
+#navbarResponsive .nav-link:focus img {
+  background-color: rgba(0,0,0,0.05); /* light gray on hover */
+  border-radius: .25rem;
+}
+#navbarResponsive .nav-link.active img,
+#navbarResponsive .nav-item.show > .nav-link img {
+  background-color: #cce0e6; /* pale blue-gray when active */
+  border-radius: .25rem;
+}
+
 ol ol,
 ul ul,
 ol ul,

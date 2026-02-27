@@ -45,16 +45,22 @@ window.addEventListener('DOMContentLoaded', event => {
       });
   });
 
-  // attach showSection to navigation items
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems.forEach(item => {
-    item.addEventListener('click', e => {
+  // attach showSection to navigation links and manage their active state
+  const navLinks = document.querySelectorAll('#navbarResponsive .nav-link');
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
       e.preventDefault();
-      const link = item.querySelector('.nav-link');
-      if (link) {
-        const targetId = link.getAttribute('data-val');
+      // get target id from data-val, href hash, or empty fallback
+      let targetId = link.dataset.val || link.getAttribute('href').substring(1);
+      if (!targetId) {
+        targetId = '';
+      }
+      if (targetId) {
         showSection(targetId);
       }
+      // update active class on links
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
     });
   });
 
@@ -63,6 +69,7 @@ window.addEventListener('DOMContentLoaded', event => {
     homeItem.addEventListener('click', e => {
       e.preventDefault();
       showSection('home');
+      navLinks.forEach(l => l.classList.remove('active'));
     });
   }
   showSection('home');
