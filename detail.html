@@ -41,6 +41,11 @@
             cols.push(cur);
             return cols.map(s => s.trim());
         }
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>\"']/g, function (s) {
+                return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s];
+            });
+        }
         function getParam(name) {
             const params = new URLSearchParams(location.search);
             return params.get(name);
@@ -94,8 +99,11 @@
 
                     // optional text content if a 5th column exists (본문 now at index 4)
                     if (found.length > 4 && found[4].trim()) {
-                        const textPar = document.createElement('p');
-                        textPar.textContent = found[4];
+                        const textPar = document.createElement('div');
+                        // escape HTML and preserve newlines
+                        const escaped = escapeHtml(found[4]);
+                        textPar.innerHTML = escaped.replace(/\r?\n/g, '<br>');
+                        textPar.className = 'mb-3';
                         body.appendChild(textPar);
                     }
 
