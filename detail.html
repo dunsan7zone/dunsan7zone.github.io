@@ -17,6 +17,7 @@
     </nav>
     <div class="container mt-5">
         <h2>공지사항 상세</h2>
+        <!-- detail content will be filled with a Bootstrap card -->
         <div id="detailContent"></div>
     </div>
     <script>
@@ -47,35 +48,51 @@
                         container.textContent = '글을 찾을 수 없습니다.';
                         return;
                     }
-                    const labels = ['번호','제목','작성자','날짜','이미지 목록'];
-                    const dl = document.createElement('dl');
-                    found.forEach((value, idx) => {
-                        if (idx >= labels.length) return; // ignore extra columns
-                        const dt = document.createElement('dt');
-                        dt.textContent = labels[idx];
-                        const dd = document.createElement('dd');
-                        if (idx === 4 && value) {
-                            // image list column: separate by | or comma
-                            const names = value.split(/[|,]/).map(s=>s.trim()).filter(Boolean);
+                    // build a Bootstrap card for the details
+                    container.innerHTML = '';
+                    const card = document.createElement('div');
+                    card.className = 'card mb-4';
+                    const body = document.createElement('div');
+                    body.className = 'card-body';
+
+                    // title
+                    const titleEl = document.createElement('h3');
+                    titleEl.className = 'card-title';
+                    titleEl.textContent = found[1] || '제목 없음';
+                    body.appendChild(titleEl);
+
+                    // meta info (author/date)
+                    const meta = document.createElement('p');
+                    meta.className = 'text-muted small mb-3';
+                    meta.textContent = `작성자: ${found[2] || '-'} · 날짜: ${found[3] || '-'}`;
+                    body.appendChild(meta);
+
+                    // optional text content if a 6th column exists
+                    if (found.length > 5 && found[5].trim()) {
+                        const textPar = document.createElement('p');
+                        textPar.textContent = found[5];
+                        body.appendChild(textPar);
+                    }
+
+                    // images
+                    if (found[4]) {
+                        const names = found[4].split(/[|,]/).map(s=>s.trim()).filter(Boolean);
+                        if (names.length > 0) {
+                            const imgWrapper = document.createElement('div');
+                            imgWrapper.className = 'mb-3';
                             names.forEach(name => {
                                 const img = document.createElement('img');
                                 img.src = `notice_img/${encodeURIComponent(found[0])}_${encodeURIComponent(name)}`;
                                 img.alt = name;
-                                img.style.maxWidth = '100%';
-                                img.style.display = 'block';
-                                img.style.marginBottom = '0.5rem';
-                                dd.appendChild(img);
+                                img.className = 'img-fluid mb-2';
+                                imgWrapper.appendChild(img);
                             });
-                            if (names.length === 0) {
-                                dd.textContent = '(이미지 없음)';
-                            }
-                        } else {
-                            dd.textContent = value;
+                            body.appendChild(imgWrapper);
                         }
-                        dl.appendChild(dt);
-                        dl.appendChild(dd);
-                    });
-                    container.appendChild(dl);
+                    }
+
+                    card.appendChild(body);
+                    container.appendChild(card);
                 })
                 .catch(err => {
                     console.error(err);
