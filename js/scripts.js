@@ -155,11 +155,30 @@ function loadBoard(csvPath = 'data/notice.csv') {
             }
 
             if (current === 0) {
+                // show a placeholder row so user sees something
+                const trEmpty = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 4;
+                td.textContent = '공지사항 데이터를 불러올 수 없습니다.';
+                td.style.textAlign = 'center';
+                trEmpty.appendChild(td);
+                tbody.appendChild(trEmpty);
                 console.warn('loadBoard: no data rows found (check CSV path or server environment)');
             }
         })
         .catch(err => {
             console.error('Failed to load board CSV:', err);
             console.info('If you are opening via file://, fetching local files is blocked. Use a local web server (e.g. Live Server extension).');
+            // also show message in table
+            const tbody = document.querySelector('#boardTable tbody');
+            if (tbody && tbody.children.length === 0) {
+                const trErr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 4;
+                td.textContent = '공지사항 데이터를 불러오는 중 오류가 발생했습니다.';
+                td.style.textAlign = 'center';
+                trErr.appendChild(td);
+                tbody.appendChild(trErr);
+            }
         });
 }
