@@ -100,8 +100,10 @@
                     // optional text content if a 5th column exists (본문 now at index 4)
                     if (found.length > 4 && found[4].trim()) {
                         const textPar = document.createElement('div');
-                        // escape HTML and preserve newlines
-                        const escaped = escapeHtml(found[4]);
+                        // convert literal backslash-n sequences ("\n") into actual newlines,
+                        // then escape HTML and finally replace newlines with <br>
+                        const withRealNewlines = found[4].replace(/\\r?\\n/g, '\n');
+                        const escaped = escapeHtml(withRealNewlines);
                         textPar.innerHTML = escaped.replace(/\r?\n/g, '<br>');
                         textPar.className = 'mb-3';
                         body.appendChild(textPar);
