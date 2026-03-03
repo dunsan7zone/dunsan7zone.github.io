@@ -11301,6 +11301,11 @@ footer a:hover, footer a:active, footer a:focus {
   #boardTable thead { display: none; }
   #boardTable { border-spacing: 0 8px; --bs-table-accent-bg: transparent; }
   #boardTable tbody { display: block; }
+  /* override Bootstrap's .table-striped rule */
+  #boardTable.table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: transparent;
+    background-color: transparent;
+  }
   /* each row as border-only card */
   #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: transparent; border: 1px solid #e9ecef; }
   #boardTable tbody tr:nth-child(odd) { background-color: #f8f9fa; }
