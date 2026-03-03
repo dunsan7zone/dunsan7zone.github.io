@@ -11278,10 +11278,10 @@ footer a:hover, footer a:active, footer a:focus {
   padding-bottom: 8px;
 }
 #boardTable tbody tr {
+  /* only border, no inner shading for mobile we will override */
   background: #fff;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 #boardTable tbody tr td {
   border: none;
@@ -11290,21 +11290,23 @@ footer a:hover, footer a:active, footer a:focus {
 }
 
 /* column widths on desktop */
-.td-number { width: 90px; max-width: 90px; }
-.td-date { width: 90px; max-width: 90px; }
-.td-title { width: auto; }
+.td-number { width: 110px; max-width: 110px; }
+.td-date { width: 140px; max-width: 140px; white-space: nowrap; }
+.td-title { width: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* keep header visible on mobile, and show rows as stacked cards */
+/* Mobile adjustments: hide header, remove inner shading, show border only, stacked layout */
 @media (max-width: 576px) {
   #boardContainer { min-height: calc(1.5rem * 5 + 4rem); }
-  #boardTable thead { display: table-header-group; }
+  /* hide label/header row on mobile */
+  #boardTable thead { display: none; }
   #boardTable { border-spacing: 0 8px; }
   #boardTable tbody { display: block; }
-  #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; }
-  #boardTable tbody tr td { display: block; padding: 4px 0; }
-  /* first line: number (left) and date (right) on same line */
-  #boardTable tbody tr .td-number { display: inline-block; width: 30%; font-weight: 600; color: #6c757d; }
-  #boardTable tbody tr .td-date { display: inline-block; width: 30%; float: right; text-align: right; color: #6c757d; }
-  /* title on its own line below */
-  #boardTable tbody tr .td-title { display: block; width: 100%; margin-top: 8px; font-weight: 700; }
+  /* each row as border-only card with transparent background */
+  #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: transparent; border: 1px solid #e9ecef; }
+  #boardTable tbody tr td { display: block; padding: 2px 0; overflow: hidden; }
+  /* top line: number (left) and date (right) */
+  #boardTable tbody tr .td-number { display: inline-block; width: 45%; font-weight: 600; color: #6c757d; white-space: nowrap; }
+  #boardTable tbody tr .td-date { display: inline-block; width: 45%; float: right; text-align: right; color: #6c757d; white-space: nowrap; }
+  /* title as second line with ellipsis */
+  #boardTable tbody tr .td-title { display: block; width: 100%; margin-top: 6px; font-weight: 700; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 }

@@ -21,6 +21,26 @@
         <div id="detailContent"></div>
     </div>
     <script>
+        // simple CSV line parser that supports quoted fields
+        function parseCSVLine(line) {
+            const cols = [];
+            let cur = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
+                    else { inQuotes = !inQuotes; }
+                } else if (ch === ',' && !inQuotes) {
+                    cols.push(cur);
+                    cur = '';
+                } else {
+                    cur += ch;
+                }
+            }
+            cols.push(cur);
+            return cols.map(s => s.trim());
+        }
         function getParam(name) {
             const params = new URLSearchParams(location.search);
             return params.get(name);
@@ -42,7 +62,7 @@
                     if (lines.length > 0) lines.shift(); // drop header
                     let found = null;
                     lines.forEach(line => {
-                        const cols = line.split(',');
+                        const cols = parseCSVLine(line);
                         if (cols[0] === id) {
                             found = cols;
                         }
@@ -72,16 +92,16 @@
                     meta.textContent = `작성자: ${found[2] || '-'} · 날짜: ${found[3] || '-'}`;
                     body.appendChild(meta);
 
-                    // optional text content if a 6th column exists
-                    if (found.length > 5 && found[5].trim()) {
+                    // optional text content if a 5th column exists (본문 now at index 4)
+                    if (found.length > 4 && found[4].trim()) {
                         const textPar = document.createElement('p');
-                        textPar.textContent = found[5];
+                        textPar.textContent = found[4];
                         body.appendChild(textPar);
                     }
 
-                    // images
-                    if (found[4]) {
-                        const names = found[4].split(/[|,]/).map(s=>s.trim()).filter(Boolean);
+                    // images (now at index 5)
+                    if (found.length > 5 && found[5]) {
+                        const names = found[5].split(/[|,]/).map(s=>s.trim()).filter(Boolean);
                         if (names.length > 0) {
                             const imgWrapper = document.createElement('div');
                             imgWrapper.className = 'mb-3';

@@ -117,8 +117,8 @@ function loadBoard(csvPath = 'data/notice.csv') {
       const lines = text.trim().split(/\r?\n/);
       // drop header if exists
       if (lines.length > 0) lines.shift();
-      // parse CSV rows (simple split by comma)
-      window.boardData = lines.map(l => l.split(','));
+      // parse CSV rows (support quoted fields)
+      window.boardData = lines.map(l => parseCSVLine(l));
       renderBoard();
 
       // attach search handlers once
@@ -216,4 +216,30 @@ function renderBoard(filterText = '', field = 'title') {
   }
 
   // no padding rows: show exactly available items
+}
+
+// utility: parse a CSV line supporting quoted fields and commas inside quotes
+function parseCSVLine(line) {
+  const cols = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { // escaped quote
+        cur += '"';
+        i++; // skip next
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === ',' && !inQuotes) {
+      cols.push(cur);
+      cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  cols.push(cur);
+  // trim surrounding whitespace
+  return cols.map(s => s.trim());
 }
