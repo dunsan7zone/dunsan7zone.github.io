@@ -19,6 +19,15 @@ function showSection(targetId) {
     if (target) {
       target.classList.add('active');
     }
+    
+    // clear search input when entering notice section
+    if (targetId === 'notice') {
+      const searchInput = document.getElementById('boardSearch');
+      if (searchInput) {
+        searchInput.value = '';
+        renderBoard('', 'title');
+      }
+    }
   }
 
 window.addEventListener('DOMContentLoaded', event => {
@@ -75,6 +84,22 @@ window.addEventListener('DOMContentLoaded', event => {
       history.replaceState(null, '', '#home');
     });
   }
+  
+  // attach click handlers to other data-val buttons/links (outside navbar)
+  const otherDataValLinks = document.querySelectorAll('[data-val]:not(#navbarResponsive [data-val])');
+  otherDataValLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const targetId = link.dataset.val;
+      if (targetId) {
+        showSection(targetId);
+        history.replaceState(null, '', '#' + targetId);
+        // update active class on nav links if applicable
+        navLinks.forEach(l => l.classList.remove('active'));
+      }
+    });
+  });
+  
   // on initial load, check for a hash to restore section
   let initial = 'home';
   if (location.hash) {
@@ -120,6 +145,7 @@ function loadBoard(csvPath = 'data/notice.csv') {
       // parse CSV rows (support quoted fields)
       window.boardData = lines.map(l => parseCSVLine(l));
       renderBoard();
+      renderRecentNotices();
 
       // attach search handlers once
       const searchInput = document.getElementById('boardSearch');
@@ -216,6 +242,35 @@ function renderBoard(filterText = '', field = 'title') {
   }
 
   // no padding rows: show exactly available items
+}
+
+/**
+ * Render recent 3 notices on home section
+ */
+function renderRecentNotices() {
+  const container = document.getElementById('recentNotices');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  const data = window.boardData || [];
+  if (data.length === 0) return;
+  
+  // sort by number (col[0]) in descending order, take top 3
+  const sorted = [...data].sort((a, b) => {
+    const numA = parseInt(a[0]) || 0;
+    const numB = parseInt(b[0]) || 0;
+    return numB - numA;
+  });
+  
+  const recent = sorted.slice(0, 3);
+  
+  recent.forEach(cols => {
+    const a = document.createElement('a');
+    a.href = `detail.html?id=${encodeURIComponent(cols[0])}`;
+    a.className = 'btn btn-outline-secondary w-100 text-start text-truncate p-2';
+    a.textContent = `[${cols[0]}] ${cols[1]}`;
+    container.appendChild(a);
+  });
 }
 
 // utility: parse a CSV line supporting quoted fields and commas inside quotes
