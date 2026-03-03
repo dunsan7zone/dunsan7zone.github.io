@@ -155,7 +155,7 @@ function loadBoard(csvPath = 'data/notice.csv') {
 /**
  * Render board rows from window.boardData with optional filter
  * @param {string} filterText
- * @param {string} field one of 'title','number','date','all'
+ * @param {string} field (ignored - search title only)
  */
 function renderBoard(filterText = '', field = 'title') {
   const tbody = document.querySelector('#boardTable tbody');
@@ -165,14 +165,9 @@ function renderBoard(filterText = '', field = 'title') {
   const q = (filterText || '').trim().toLowerCase();
   const results = data.filter(cols => {
     if (!q) return true;
-    const num = (cols[0]||'').toLowerCase();
+    // search only title (col[1])
     const title = (cols[1]||'').toLowerCase();
-    const date = (cols[3]||'').toLowerCase();
-    if (field === 'number') return num.indexOf(q) !== -1;
-    if (field === 'date') return date.indexOf(q) !== -1;
-    if (field === 'title') return title.indexOf(q) !== -1;
-    // all
-    return (num + ' ' + title + ' ' + date).indexOf(q) !== -1;
+    return title.indexOf(q) !== -1;
   });
 
   // render matched rows
