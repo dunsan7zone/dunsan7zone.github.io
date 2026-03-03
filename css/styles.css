@@ -11321,46 +11321,46 @@ footer a:hover, footer a:active, footer a:focus {
 
 /* Custom Action Buttons */
 .btn-custom-kakao {
-  background-color: #FEE500;
-  color: #000000;
-  border: none;
+  background-color: #FEE500 !important;
+  color: #000000 !important;
+  border: none !important;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .btn-custom-kakao:hover {
-  background-color: #FDD700;
-  color: #000000;
+  background-color: #FDD700 !important;
+  color: #000000 !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-custom-phone {
-  background-color: #198754;
-  color: #ffffff;
-  border: none;
+  background-color: #198754 !important;
+  color: #ffffff !important;
+  border: none !important;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .btn-custom-phone:hover {
-  background-color: #157347;
-  color: #ffffff;
+  background-color: #157347 !important;
+  color: #ffffff !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-custom-purple {
-  background-color: #7952B3;
-  color: #ffffff;
-  border: none;
+  background-color: #7952B3 !important;
+  color: #ffffff !important;
+  border: none !important;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .btn-custom-purple:hover {
-  background-color: #6741A3;
-  color: #ffffff;
+  background-color: #6741A3 !important;
+  color: #ffffff !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
