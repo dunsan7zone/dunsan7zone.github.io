@@ -11296,21 +11296,21 @@ footer a:hover, footer a:active, footer a:focus {
 
 /* Mobile adjustments: hide header, stacked layout (id, date, title order) */
 @media (max-width: 576px) {
-  #boardContainer { min-height: calc(1.5rem * 5 + 4rem); overflow-x: hidden; }
+  #boardContainer { min-height: calc(1.5rem * 5 + 4rem); overflow-x: hidden !important; }
   /* hide label/header row on mobile */
   #boardTable thead { display: none; }
-  #boardTable { border-spacing: 0 8px; --bs-table-accent-bg: transparent; width: 100%; overflow: hidden; }
-  #boardTable tbody { display: block; }
+  #boardTable { border-spacing: 0 8px; --bs-table-accent-bg: transparent; width: 100%; }
+  #boardTable tbody { display: block; width: 100%; }
   /* override Bootstrap's .table-striped rule */
   #boardTable.table-striped > tbody > tr:nth-of-type(odd) > * {
     --bs-table-accent-bg: transparent;
     background-color: transparent;
   }
   /* each row as border-only card */
-  #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: transparent; border: 1px solid #e9ecef; box-sizing: border-box; }
+  #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: transparent; border: 1px solid #e9ecef; width: 100%; box-sizing: border-box; }
   #boardTable tbody tr:nth-child(odd) { background-color: #f8f9fa; }
   #boardTable tbody tr:hover { background-color: #e8eef5; }
-  #boardTable tbody tr td { display: block; padding: 4px 0; overflow: hidden; max-width: 100%; }
+  #boardTable tbody tr td { display: block; padding: 4px 0; overflow: hidden; max-width: 100%; width: 100%; box-sizing: border-box; }
   /* id on first line */
   #boardTable tbody tr .td-number { display: block; width: 100%; font-weight: 600; color: #6c757d; }
   /* date on second line */
