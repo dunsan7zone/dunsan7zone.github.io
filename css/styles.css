@@ -11233,3 +11233,26 @@ footer a:hover, footer a:active, footer a:focus {
 .page-section.active {
   display: block;
 }
+
+/* 게시판 관련 커스텀 */
+#boardTable tbody tr { cursor: pointer; }
+#boardTable tbody tr:hover { background-color: #f8f9fa; }
+/* 헤더 row는 클릭 표시 안함 */
+#boardTable thead tr { cursor: default; }
+.empty-row td { height: 1.5rem; }
+
+/* added spacing for notice heading */
+#notice h2 {
+    margin-top: 30px;
+}
+
+/* 최소 높이 확보: 통상 10행, 모바일 5행 */
+#boardContainer {
+    /* 각각 행 높이 약 1.5rem + 여백 */
+    min-height: calc(1.5rem * 10 + 1rem);
+}
+@media (max-width: 576px) {
+    #boardContainer {
+        min-height: calc(1.5rem * 5 + 1rem);
+    }
+}

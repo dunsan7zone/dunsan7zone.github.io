@@ -57,6 +57,8 @@ window.addEventListener('DOMContentLoaded', event => {
       }
       if (targetId) {
         showSection(targetId);
+        // update hash so it persists across refresh
+        history.replaceState(null, '', '#' + targetId);
       }
       // update active class on links
       navLinks.forEach(l => l.classList.remove('active'));
@@ -70,9 +72,20 @@ window.addEventListener('DOMContentLoaded', event => {
       e.preventDefault();
       showSection('home');
       navLinks.forEach(l => l.classList.remove('active'));
+      history.replaceState(null, '', '#home');
     });
   }
-  showSection('home');
+  // on initial load, check for a hash to restore section
+  let initial = 'home';
+  if (location.hash) {
+    initial = location.hash.substring(1);
+  }
+  showSection(initial);
+  // highlight link if any
+  navLinks.forEach(l => {
+    const val = l.dataset.val || l.getAttribute('href').substring(1);
+    if (val === initial) l.classList.add('active');
+  });
 
   // initialize masthead carousel if present (auto sliding)
   const carouselEl = document.getElementById('mastheadCarousel');
@@ -82,4 +95,71 @@ window.addEventListener('DOMContentLoaded', event => {
           ride: 'carousel'
       });
   }
+
+  // load board data from CSV
+  loadBoard();
 });
+
+/**
+ * Simple CSV parser and table builder
+ * @param {string} csvPath path to the CSV file relative to site root
+ */
+function loadBoard(csvPath = 'data/notice.csv') {
+    fetch(csvPath)
+        .then(resp => {
+            if (!resp.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return resp.text();
+        })
+        .then(text => {
+            const lines = text.trim().split(/\r?\n/);
+            const tbody = document.querySelector('#boardTable tbody');
+            if (!tbody) return;
+
+            // assume first line is header, remove it
+            if (lines.length > 0) {
+                lines.shift();
+            }
+
+            lines.forEach(line => {
+                const cols = line.split(',');
+                const tr = document.createElement('tr');
+                tr.style.cursor = 'pointer';
+                tr.dataset.id = cols[0] || '';
+                // only show first four columns in the list (번호,제목,작성자,날짜)
+                cols.slice(0,4).forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = col;
+                    tr.appendChild(td);
+                });
+                tr.addEventListener('click', () => {
+                    if (tr.dataset.id) {
+                        location.href = `detail.html?id=${encodeURIComponent(tr.dataset.id)}`;
+                    }
+                });
+                tbody.appendChild(tr);
+            });
+
+            // ensure at least 20 rows (empty placeholders)
+            const current = tbody.querySelectorAll('tr').length;
+            for (let i = current; i < 20; i++) {
+                const tr = document.createElement('tr');
+                tr.classList.add('empty-row');
+                for (let j = 0; j < 4; j++) {
+                    const td = document.createElement('td');
+                    td.innerHTML = '&nbsp;';
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+
+            if (current === 0) {
+                console.warn('loadBoard: no data rows found (check CSV path or server environment)');
+            }
+        })
+        .catch(err => {
+            console.error('Failed to load board CSV:', err);
+            console.info('If you are opening via file://, fetching local files is blocked. Use a local web server (e.g. Live Server extension).');
+        });
+}

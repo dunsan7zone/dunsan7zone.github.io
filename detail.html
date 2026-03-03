@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>공지사항 상세</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Bootstrap icons & CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container">
+            <a href="index.html#notice" class="navbar-brand">&lt; 공지사항 목록으로</a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h2>공지사항 상세</h2>
+        <div id="detailContent"></div>
+    </div>
+    <script>
+        function getParam(name) {
+            const params = new URLSearchParams(location.search);
+            return params.get(name);
+        }
+        function loadDetail(csvPath = 'data/notice.csv') {
+            const id = getParam('id');
+            if (!id) {
+                document.getElementById('detailContent').textContent = '잘못된 접근입니다.';
+                return;
+            }
+            fetch(csvPath)
+                .then(r => r.text())
+                .then(text => {
+                    const lines = text.trim().split(/\r?\n/);
+                    if (lines.length > 0) lines.shift(); // drop header
+                    let found = null;
+                    lines.forEach(line => {
+                        const cols = line.split(',');
+                        if (cols[0] === id) {
+                            found = cols;
+                        }
+                    });
+                    const container = document.getElementById('detailContent');
+                    if (!found) {
+                        container.textContent = '글을 찾을 수 없습니다.';
+                        return;
+                    }
+                    const labels = ['번호','제목','작성자','날짜','이미지 목록'];
+                    const dl = document.createElement('dl');
+                    found.forEach((value, idx) => {
+                        if (idx >= labels.length) return; // ignore extra columns
+                        const dt = document.createElement('dt');
+                        dt.textContent = labels[idx];
+                        const dd = document.createElement('dd');
+                        if (idx === 4 && value) {
+                            // image list column: separate by | or comma
+                            const names = value.split(/[|,]/).map(s=>s.trim()).filter(Boolean);
+                            names.forEach(name => {
+                                const img = document.createElement('img');
+                                img.src = `notice_img/${encodeURIComponent(found[0])}_${encodeURIComponent(name)}`;
+                                img.alt = name;
+                                img.style.maxWidth = '100%';
+                                img.style.display = 'block';
+                                img.style.marginBottom = '0.5rem';
+                                dd.appendChild(img);
+                            });
+                            if (names.length === 0) {
+                                dd.textContent = '(이미지 없음)';
+                            }
+                        } else {
+                            dd.textContent = value;
+                        }
+                        dl.appendChild(dt);
+                        dl.appendChild(dd);
+                    });
+                    container.appendChild(dl);
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('detailContent').textContent = '데이터 로드 오류';
+                });
+        }
+        window.addEventListener('DOMContentLoaded', loadDetail);
+    </script>
+</body>
+</html>
