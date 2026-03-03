@@ -215,16 +215,5 @@ function renderBoard(filterText = '', field = 'title') {
     tbody.appendChild(trEmpty);
   }
 
-  // pad to at least 20 rows
-  const current = tbody.querySelectorAll('tr').length;
-  for (let i = current; i < 20; i++) {
-    const tr = document.createElement('tr');
-    tr.classList.add('empty-row');
-    for (let j = 0; j < 3; j++) {
-      const td = document.createElement('td');
-      td.innerHTML = '&nbsp;';
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-  }
+  // no padding rows: show exactly available items
 }

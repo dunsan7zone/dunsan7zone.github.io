@@ -11268,13 +11268,43 @@ footer a:hover, footer a:active, footer a:focus {
   #boardSearchField { width: 34%; }
 }
 
-/* Mobile list layout: first line number + title, second line date */
+/* Desktop: table spacing between rows and bordered cards */
+#boardTable {
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+#boardTable thead tr th {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+#boardTable tbody tr {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+#boardTable tbody tr td {
+  border: none;
+  vertical-align: middle;
+  padding: 12px 16px;
+}
+
+/* column widths on desktop */
+.td-number { width: 90px; max-width: 90px; }
+.td-date { width: 90px; max-width: 90px; }
+.td-title { width: auto; }
+
+/* keep header visible on mobile, and show rows as stacked cards */
 @media (max-width: 576px) {
-  #boardTable thead { display: none; }
-  #boardTable, #boardTable tbody, #boardTable tr, #boardTable td { width: 100%; display: block; }
-  #boardTable tbody tr { padding: 0.5rem 0; border-bottom: 1px solid #e9ecef; }
-  #boardTable tbody tr td { display: inline-block; vertical-align: middle; padding: 0.15rem 0; }
-  #boardTable tbody tr td.td-number { width: 20%; font-weight: 600; color: #6c757d; }
-  #boardTable tbody tr td.td-title { width: 75%; font-weight: 600; }
-  #boardTable tbody tr td.td-date { display: block; width: 100%; color: #6c757d; font-size: 0.95rem; margin-top: 4px; }
+  #boardContainer { min-height: calc(1.5rem * 5 + 4rem); }
+  #boardTable thead { display: table-header-group; }
+  #boardTable { border-spacing: 0 8px; }
+  #boardTable tbody { display: block; }
+  #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; }
+  #boardTable tbody tr td { display: block; padding: 4px 0; }
+  /* first line: number (left) and date (right) on same line */
+  #boardTable tbody tr .td-number { display: inline-block; width: 30%; font-weight: 600; color: #6c757d; }
+  #boardTable tbody tr .td-date { display: inline-block; width: 30%; float: right; text-align: right; color: #6c757d; }
+  /* title on its own line below */
+  #boardTable tbody tr .td-title { display: block; width: 100%; margin-top: 8px; font-weight: 700; }
 }
