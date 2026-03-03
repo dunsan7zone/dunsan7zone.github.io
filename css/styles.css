@@ -11310,7 +11310,7 @@ footer a:hover, footer a:active, footer a:focus {
   #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: transparent; border: 1px solid #e9ecef; }
   #boardTable tbody tr:nth-child(odd) { background-color: #f8f9fa; }
   #boardTable tbody tr:hover { background-color: #e8eef5; }
-  #boardTable tbody tr td { display: block; padding: 4px 0; overflow: hidden; }
+  #boardTable tbody tr td { display: block; padding: 4px 0; overflow: hidden; max-width: 100%; }
   /* id on first line */
   #boardTable tbody tr .td-number { display: block; width: 100%; font-weight: 600; color: #6c757d; }
   /* date on second line */
