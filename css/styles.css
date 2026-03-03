@@ -11299,10 +11299,11 @@ footer a:hover, footer a:active, footer a:focus {
   #boardContainer { min-height: calc(1.5rem * 5 + 4rem); }
   /* hide label/header row on mobile */
   #boardTable thead { display: none; }
-  #boardTable { border-spacing: 0 8px; }
+  #boardTable { border-spacing: 0 8px; --bs-table-accent-bg: transparent; }
   #boardTable tbody { display: block; }
   /* each row as border-only card */
   #boardTable tbody tr { display: block; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: transparent; border: 1px solid #e9ecef; }
+  #boardTable tbody tr:nth-child(odd) { background-color: #f8f9fa; }
   #boardTable tbody tr td { display: block; padding: 4px 0; overflow: hidden; }
   /* id on first line */
   #boardTable tbody tr .td-number { display: block; width: 100%; font-weight: 600; color: #6c757d; }
