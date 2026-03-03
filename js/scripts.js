@@ -105,80 +105,126 @@ window.addEventListener('DOMContentLoaded', event => {
  * @param {string} csvPath path to the CSV file relative to site root
  */
 function loadBoard(csvPath = 'data/notice.csv') {
-    fetch(csvPath)
-        .then(resp => {
-            if (!resp.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return resp.text();
-        })
-        .then(text => {
-            const lines = text.trim().split(/\r?\n/);
-            const tbody = document.querySelector('#boardTable tbody');
-            if (!tbody) return;
+  // load CSV, cache parsed rows to window.boardData and render via renderBoard
+  fetch(csvPath)
+    .then(resp => {
+      if (!resp.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return resp.text();
+    })
+    .then(text => {
+      const lines = text.trim().split(/\r?\n/);
+      // drop header if exists
+      if (lines.length > 0) lines.shift();
+      // parse CSV rows (simple split by comma)
+      window.boardData = lines.map(l => l.split(','));
+      renderBoard();
 
-            // assume first line is header, remove it
-            if (lines.length > 0) {
-                lines.shift();
-            }
-
-            lines.forEach(line => {
-                const cols = line.split(',');
-                const tr = document.createElement('tr');
-                tr.style.cursor = 'pointer';
-                tr.dataset.id = cols[0] || '';
-                // only show first four columns in the list (번호,제목,작성자,날짜)
-                cols.slice(0,4).forEach(col => {
-                    const td = document.createElement('td');
-                    td.textContent = col;
-                    tr.appendChild(td);
-                });
-                tr.addEventListener('click', () => {
-                    if (tr.dataset.id) {
-                        location.href = `detail.html?id=${encodeURIComponent(tr.dataset.id)}`;
-                    }
-                });
-                tbody.appendChild(tr);
-            });
-
-            // ensure at least 20 rows (empty placeholders)
-            const current = tbody.querySelectorAll('tr').length;
-            for (let i = current; i < 20; i++) {
-                const tr = document.createElement('tr');
-                tr.classList.add('empty-row');
-                for (let j = 0; j < 4; j++) {
-                    const td = document.createElement('td');
-                    td.innerHTML = '&nbsp;';
-                    tr.appendChild(td);
-                }
-                tbody.appendChild(tr);
-            }
-
-            if (current === 0) {
-                // show a placeholder row so user sees something
-                const trEmpty = document.createElement('tr');
-                const td = document.createElement('td');
-                td.colSpan = 4;
-                td.textContent = '공지사항 데이터를 불러올 수 없습니다.';
-                td.style.textAlign = 'center';
-                trEmpty.appendChild(td);
-                tbody.appendChild(trEmpty);
-                console.warn('loadBoard: no data rows found (check CSV path or server environment)');
-            }
-        })
-        .catch(err => {
-            console.error('Failed to load board CSV:', err);
-            console.info('If you are opening via file://, fetching local files is blocked. Use a local web server (e.g. Live Server extension).');
-            // also show message in table
-            const tbody = document.querySelector('#boardTable tbody');
-            if (tbody && tbody.children.length === 0) {
-                const trErr = document.createElement('tr');
-                const td = document.createElement('td');
-                td.colSpan = 4;
-                td.textContent = '공지사항 데이터를 불러오는 중 오류가 발생했습니다.';
-                td.style.textAlign = 'center';
-                trErr.appendChild(td);
-                tbody.appendChild(trErr);
-            }
+      // attach search handlers once
+      const searchInput = document.getElementById('boardSearch');
+      const searchField = document.getElementById('boardSearchField');
+      if (searchInput && !searchInput._attached) {
+        let timer = null;
+        searchInput.addEventListener('input', () => {
+          clearTimeout(timer);
+          timer = setTimeout(() => renderBoard(searchInput.value, searchField ? searchField.value : 'title'), 200);
         });
+        if (searchField) {
+          searchField.addEventListener('change', () => renderBoard(searchInput.value, searchField.value));
+        }
+        searchInput._attached = true;
+      }
+    })
+    .catch(err => {
+      console.error('Failed to load board CSV:', err);
+      console.info('If you are opening via file://, fetching local files is blocked. Use a local web server (e.g. Live Server extension).');
+      const tbody = document.querySelector('#boardTable tbody');
+      if (tbody && tbody.children.length === 0) {
+        const trErr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 3;
+        td.textContent = '공지사항 데이터를 불러오는 중 오류가 발생했습니다.';
+        td.style.textAlign = 'center';
+        trErr.appendChild(td);
+        tbody.appendChild(trErr);
+      }
+    });
+}
+
+/**
+ * Render board rows from window.boardData with optional filter
+ * @param {string} filterText
+ * @param {string} field one of 'title','number','date','all'
+ */
+function renderBoard(filterText = '', field = 'title') {
+  const tbody = document.querySelector('#boardTable tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const data = window.boardData || [];
+  const q = (filterText || '').trim().toLowerCase();
+  const results = data.filter(cols => {
+    if (!q) return true;
+    const num = (cols[0]||'').toLowerCase();
+    const title = (cols[1]||'').toLowerCase();
+    const date = (cols[3]||'').toLowerCase();
+    if (field === 'number') return num.indexOf(q) !== -1;
+    if (field === 'date') return date.indexOf(q) !== -1;
+    if (field === 'title') return title.indexOf(q) !== -1;
+    // all
+    return (num + ' ' + title + ' ' + date).indexOf(q) !== -1;
+  });
+
+  // render matched rows
+  results.forEach(cols => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = cols[0] || '';
+    tr.style.cursor = 'pointer';
+
+    const tdNum = document.createElement('td');
+    tdNum.className = 'td-number';
+    tdNum.textContent = cols[0] || '';
+    tr.appendChild(tdNum);
+
+    const tdTitle = document.createElement('td');
+    tdTitle.className = 'td-title';
+    tdTitle.textContent = cols[1] || '';
+    tr.appendChild(tdTitle);
+
+    const tdDate = document.createElement('td');
+    tdDate.className = 'td-date';
+    tdDate.textContent = cols[3] || '';
+    tr.appendChild(tdDate);
+
+    tr.addEventListener('click', () => {
+      if (tr.dataset.id) {
+        location.href = `detail.html?id=${encodeURIComponent(tr.dataset.id)}`;
+      }
+    });
+    tbody.appendChild(tr);
+  });
+
+  // if no results, show message
+  if (results.length === 0) {
+    const trEmpty = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 3;
+    td.textContent = '검색 결과가 없습니다.';
+    td.style.textAlign = 'center';
+    trEmpty.appendChild(td);
+    tbody.appendChild(trEmpty);
+  }
+
+  // pad to at least 20 rows
+  const current = tbody.querySelectorAll('tr').length;
+  for (let i = current; i < 20; i++) {
+    const tr = document.createElement('tr');
+    tr.classList.add('empty-row');
+    for (let j = 0; j < 3; j++) {
+      const td = document.createElement('td');
+      td.innerHTML = '&nbsp;';
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
 }

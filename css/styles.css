@@ -11235,6 +11235,7 @@ footer a:hover, footer a:active, footer a:focus {
 }
 
 /* 게시판 관련 커스텀 */
+/* 게시판 관련 커스텀 */
 #boardTable tbody tr { cursor: pointer; }
 #boardTable tbody tr:hover { background-color: #f8f9fa; }
 /* 헤더 row는 클릭 표시 안함 */
@@ -11243,16 +11244,37 @@ footer a:hover, footer a:active, footer a:focus {
 
 /* added spacing for notice heading */
 #notice h2 {
-    margin-top: 30px;
+  margin-top: 30px;
 }
 
 /* 최소 높이 확보: 통상 10행, 모바일 5행 */
 #boardContainer {
-    /* 각각 행 높이 약 1.5rem + 여백 */
-    min-height: calc(1.5rem * 10 + 1rem);
+  /* 각각 행 높이 약 1.5rem + 여백 */
+  min-height: calc(1.5rem * 10 + 1rem);
 }
 @media (max-width: 576px) {
-    #boardContainer {
-        min-height: calc(1.5rem * 5 + 1rem);
-    }
+  #boardContainer {
+    min-height: calc(1.5rem * 5 + 1rem);
+  }
+}
+
+/* search box styling */
+#boardSearch { max-width: 100%; }
+
+@media (max-width: 576px) {
+  /* make search stacked on small screens */
+  .d-flex.mb-3.align-items-center { display: flex; gap: .5rem; }
+  #boardSearch { flex: 1 1 auto; }
+  #boardSearchField { width: 34%; }
+}
+
+/* Mobile list layout: first line number + title, second line date */
+@media (max-width: 576px) {
+  #boardTable thead { display: none; }
+  #boardTable, #boardTable tbody, #boardTable tr, #boardTable td { width: 100%; display: block; }
+  #boardTable tbody tr { padding: 0.5rem 0; border-bottom: 1px solid #e9ecef; }
+  #boardTable tbody tr td { display: inline-block; vertical-align: middle; padding: 0.15rem 0; }
+  #boardTable tbody tr td.td-number { width: 20%; font-weight: 600; color: #6c757d; }
+  #boardTable tbody tr td.td-title { width: 75%; font-weight: 600; }
+  #boardTable tbody tr td.td-date { display: block; width: 100%; color: #6c757d; font-size: 0.95rem; margin-top: 4px; }
 }
