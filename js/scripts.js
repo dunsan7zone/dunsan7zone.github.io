@@ -110,6 +110,8 @@ window.addEventListener('DOMContentLoaded', event => {
     initial = location.hash.substring(1);
   }
   showSection(initial);
+  // record initial state in history
+  history.replaceState(null, '', '#' + initial);
   // highlight link if any
   navLinks.forEach(l => {
     const val = l.dataset.val || l.getAttribute('href').substring(1);
