@@ -82,7 +82,7 @@
                     document.getElementById('detailContent').textContent = '데이터 로드 오류';
                 });
         }
-        window.addEventListener('DOMContentLoaded', loadDetail);
+        window.addEventListener('DOMContentLoaded', () => loadDetail());
     </script>
 </body>
 </html>
