@@ -67,7 +67,7 @@ window.addEventListener('DOMContentLoaded', event => {
       if (targetId) {
         showSection(targetId);
         // update hash so it persists across refresh
-        history.replaceState(null, '', '#' + targetId);
+        history.pushState(null, '', '#' + targetId);
       }
       // update active class on links
       navLinks.forEach(l => l.classList.remove('active'));
@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', event => {
       e.preventDefault();
       showSection('home');
       navLinks.forEach(l => l.classList.remove('active'));
-      history.replaceState(null, '', '#home');
+      history.pushState(null, '', '#home');
     });
   }
   
@@ -93,9 +93,13 @@ window.addEventListener('DOMContentLoaded', event => {
       const targetId = link.dataset.val;
       if (targetId) {
         showSection(targetId);
-        history.replaceState(null, '', '#' + targetId);
+        history.pushState(null, '', '#' + targetId);
         // update active class on nav links if applicable
         navLinks.forEach(l => l.classList.remove('active'));
+        navLinks.forEach(l => {
+          const val = l.dataset.val || l.getAttribute('href').substring(1);
+          if (val === targetId) l.classList.add('active');
+        });
       }
     });
   });
@@ -110,6 +114,18 @@ window.addEventListener('DOMContentLoaded', event => {
   navLinks.forEach(l => {
     const val = l.dataset.val || l.getAttribute('href').substring(1);
     if (val === initial) l.classList.add('active');
+  });
+  
+  // handle browser back/forward buttons
+  window.addEventListener('popstate', () => {
+    const targetId = location.hash ? location.hash.substring(1) : 'home';
+    showSection(targetId);
+    // update active class on nav links
+    navLinks.forEach(l => l.classList.remove('active'));
+    navLinks.forEach(l => {
+      const val = l.dataset.val || l.getAttribute('href').substring(1);
+      if (val === targetId) l.classList.add('active');
+    });
   });
 
   // initialize masthead carousel if present (auto sliding)
