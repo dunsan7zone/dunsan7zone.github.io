@@ -183,7 +183,11 @@ function renderBoard(filterText = '', field = 'title') {
 
     const tdTitle = document.createElement('td');
     tdTitle.className = 'td-title';
-    tdTitle.textContent = cols[1] || '';
+    let titleText = cols[1] || '';
+    if (titleText.length > 20) {
+      titleText = titleText.substring(0, 20) + '...';
+    }
+    tdTitle.textContent = titleText;
     tr.appendChild(tdTitle);
 
     const tdDate = document.createElement('td');
