@@ -32,8 +32,12 @@
                 return;
             }
             fetch(csvPath)
-                .then(r => r.text())
+                .then(r => {
+                    console.log('fetch response', r);
+                    return r.text();
+                })
                 .then(text => {
+                    console.log('csv text length', text.length);
                     const lines = text.trim().split(/\r?\n/);
                     if (lines.length > 0) lines.shift(); // drop header
                     let found = null;
@@ -43,6 +47,7 @@
                             found = cols;
                         }
                     });
+                    console.log('found row', found);
                     const container = document.getElementById('detailContent');
                     if (!found) {
                         container.textContent = '글을 찾을 수 없습니다.';
@@ -80,13 +85,25 @@
                         if (names.length > 0) {
                             const imgWrapper = document.createElement('div');
                             imgWrapper.className = 'mb-3';
+                            let anyVisible = false;
                             names.forEach(name => {
                                 const img = document.createElement('img');
                                 img.src = `notice_img/${encodeURIComponent(found[0])}_${encodeURIComponent(name)}`;
+                                console.log('creating img', img.src);
                                 img.alt = name;
                                 img.className = 'img-fluid mb-2';
+                                img.onerror = () => { img.style.display = 'none'; console.warn('image failed', img.src); };
+                                img.onload = () => { anyVisible = true; console.log('image loaded', img.src); };
                                 imgWrapper.appendChild(img);
                             });
+                            setTimeout(() => {
+                                if (!anyVisible) {
+                                    const placeholder = document.createElement('p');
+                                    placeholder.className = 'text-muted';
+                                    placeholder.textContent = '(이미지 없음)';
+                                    imgWrapper.appendChild(placeholder);
+                                }
+                            }, 500);
                             body.appendChild(imgWrapper);
                         }
                     }
