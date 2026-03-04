@@ -93,6 +93,91 @@
             // convert literal \n, \r\n sequences into actual newlines
             return str.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
         }
+        
+        // 본문에서 URL을 감지하고 링크 + 썸네일로 변환
+        function renderContentWithLinks(text, container) {
+            if (!text) return;
+            
+            const normalized = normalizeNewlines(text);
+            const escaped = escapeHtml(normalized);
+            
+            // URL 정규표현식
+            const urlRegex = /(https?:\/\/[^\s<>\"]+)/g;
+            const urls = [];
+            let match;
+            
+            while ((match = urlRegex.exec(escaped)) !== null) {
+                urls.push(match[1]);
+            }
+            
+            // URL을 링크로 변환
+            const contentHtml = escaped.replace(
+                /(https?:\/\/[^\s<>\"]+)/g,
+                '<a href="$1" target="_blank" class="url-link" rel="noopener noreferrer">$1</a>'
+            );
+            
+            // 본문 div 생성
+            const textPar = document.createElement('div');
+            textPar.innerHTML = contentHtml.replace(/\r?\n/g, '<br>');
+            textPar.className = 'mb-4 content-text';
+            container.appendChild(textPar);
+            
+            // 발견된 URL들에 대해 썸네일 미리보기 생성
+            if (urls.length > 0) {
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'url-previews mb-4';
+                
+                urls.forEach(url => {
+                    // 중복된 URL은 한 번만 처리
+                    if (previewContainer.querySelector(`[data-url="${escapeHtml(url)}"]`)) return;
+                    
+                    const previewCard = document.createElement('div');
+                    previewCard.className = 'url-preview-card';
+                    previewCard.setAttribute('data-url', url);
+                    previewCard.innerHTML = '<div class="preview-loading"><i class="bi bi-hourglass-split"></i> 로딩 중...</div>';
+                    previewContainer.appendChild(previewCard);
+                    
+                    // microlink API를 사용해서 메타데이터 가져오기
+                    fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.status === 'ok' && data.data) {
+                                const meta = data.data;
+                                let html = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="preview-link">';
+                                
+                                if (meta.image && meta.image.url) {
+                                    html += '<div class="preview-image"><img src="' + escapeHtml(meta.image.url) + '" alt="preview"></div>';
+                                }
+                                
+                                html += '<div class="preview-content">';
+                                if (meta.title) {
+                                    html += '<div class="preview-title">' + escapeHtml(meta.title) + '</div>';
+                                }
+                                if (meta.description) {
+                                    html += '<div class="preview-desc">' + escapeHtml(meta.description).substring(0, 120) + '...</div>';
+                                }
+                                html += '<div class="preview-url">' + escapeHtml(new URL(url).hostname) + '</div>';
+                                html += '</div></a>';
+                                
+                                previewCard.innerHTML = html;
+                                previewCard.classList.add('preview-loaded');
+                            } else {
+                                // URL 메타데이터 없을 때 기본 표시
+                                previewCard.innerHTML = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="preview-link preview-minimal"><div class="preview-content"><div class="preview-title">링크 보기</div><div class="preview-url">' + escapeHtml(new URL(url).hostname) + '</div></div></a>';
+                                previewCard.classList.add('preview-loaded');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Preview fetch error:', err);
+                            previewCard.innerHTML = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="preview-link preview-minimal"><div class="preview-content"><div class="preview-title">링크 보기</div><div class="preview-url">' + escapeHtml(new URL(url).hostname) + '</div></div></a>';
+                            previewCard.classList.add('preview-loaded');
+                        });
+                });
+                
+                container.appendChild(previewContainer);
+            }
+        }
+        
         function getParam(name) {
             const params = new URLSearchParams(location.search);
             return params.get(name);
@@ -145,14 +230,7 @@
 
                     // optional text content if a 5th column exists (본문 now at index 4)
                     if (found.length > 4 && found[4].trim()) {
-                        const textPar = document.createElement('div');
-                        // normalize newlines (convert \n to actual newlines)
-                        const normalized = normalizeNewlines(found[4]);
-                        // escape HTML and replace newlines with <br>
-                        const escaped = escapeHtml(normalized);
-                        textPar.innerHTML = escaped.replace(/\r?\n/g, '<br>');
-                        textPar.className = 'mb-3';
-                        body.appendChild(textPar);
+                        renderContentWithLinks(found[4], body);
                     }
 
                     // images (now at index 5)
