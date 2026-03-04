@@ -230,8 +230,8 @@ function renderBoard(filterText = '', field = 'title') {
     tdTitle.className = 'td-title';
     let titleText = cols[1] || '';
     // apply truncation only on mobile (≤576px)
-    if (window.innerWidth <= 576 && titleText.length > 15) {
-      titleText = titleText.substring(0, 15) + '...';
+    if (window.innerWidth <= 576 && titleText.length > 19) {
+      titleText = titleText.substring(0, 19) + '...';
     }
     tdTitle.textContent = titleText;
     tr.appendChild(tdTitle);
