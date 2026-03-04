@@ -208,6 +208,29 @@ dl {
   opacity: 1;
 }
 
+/* top logo: fade out toward bottom */
+.home-top-logo-wrap {
+  position: relative;
+}
+
+.home-top-logo {
+  display: block;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 72%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 72%, rgba(0, 0, 0, 0) 100%);
+}
+
+@media (max-width: 767.98px) {
+  .home-top-logo-wrap {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-logo-slide {
+    display: none !important;
+  }
+}
+
 /* ensure sections are not hidden under fixed header (desktop & mobile) */
 .page-section {
   scroll-margin-top: 74px; /* adjust to nav height; works on all screen sizes */
@@ -11143,7 +11166,7 @@ footer a:hover, footer a:active, footer a:focus {
 
 .masthead {
   background-color: #f8f9fa;
-  padding-top: 9.5rem;
+  padding-top: 75px;
   padding-bottom: 5rem;
 }
 .masthead .masthead-device-mockup {

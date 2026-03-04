@@ -140,6 +140,24 @@ window.addEventListener('DOMContentLoaded', event => {
   // initialize masthead carousel if present (auto sliding)
   const carouselEl = document.getElementById('mastheadCarousel');
   if (carouselEl) {
+      const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+      const carouselInner = carouselEl.querySelector('.carousel-inner');
+
+      if (isMobile && carouselInner) {
+        let mobileLogoItem = carouselInner.querySelector('.mobile-logo-slide');
+
+        if (!mobileLogoItem) {
+          mobileLogoItem = document.createElement('div');
+          mobileLogoItem.className = 'carousel-item mobile-logo-slide';
+          mobileLogoItem.innerHTML = '<img class="img-fluid" src="assets/img/main_logo_tmp.png" alt="메인 로고" />';
+          carouselInner.prepend(mobileLogoItem);
+        }
+
+        const items = carouselInner.querySelectorAll('.carousel-item');
+        items.forEach(item => item.classList.remove('active'));
+        mobileLogoItem.classList.add('active');
+      }
+
       new bootstrap.Carousel(carouselEl, {
           interval: 3000,    // change slide every 3 seconds
           ride: 'carousel'
