@@ -8,6 +8,13 @@
 // 
 
 
+const APP_VERSION = window.APP_VERSION || 'dev';
+
+function appendVersion(url) {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${encodeURIComponent(APP_VERSION)}`;
+}
+
 function showSection(targetId) {
     // collect all sections each time in case DOM changes
     const sections = document.querySelectorAll('.page-section');
@@ -149,7 +156,7 @@ window.addEventListener('DOMContentLoaded', event => {
  */
 function loadBoard(csvPath = 'data/notice.csv') {
   // load CSV, cache parsed rows to window.boardData and render via renderBoard
-  fetch(csvPath)
+  fetch(appendVersion(csvPath), { cache: 'no-store' })
     .then(resp => {
       if (!resp.ok) {
         throw new Error('Network response was not ok');
