@@ -25,6 +25,8 @@ function showSection(targetId) {
     const target = document.getElementById(targetId);
     if (target) {
       target.classList.add('active');
+      // Scroll to the top of the target section
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
     // clear search input when entering notice section
