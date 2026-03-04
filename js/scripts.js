@@ -157,11 +157,12 @@ function loadBoard(csvPath = 'data/notice.csv') {
       return resp.text();
     })
     .then(text => {
-      const lines = text.trim().split(/\r?\n/);
+      // parse CSV with proper handling of quoted fields including line breaks
+      const lines = parseCSV(text.trim());
       // drop header if exists
       if (lines.length > 0) lines.shift();
-      // parse CSV rows (support quoted fields)
-      window.boardData = lines.map(l => parseCSVLine(l));
+      // store parsed rows
+      window.boardData = lines;
       renderBoard();
       renderRecentNotices();
 
@@ -307,6 +308,52 @@ function renderRecentNotices() {
   });
 }
 
+// utility: parse entire CSV text with support for line breaks in quoted fields
+function parseCSV(text) {
+  const rows = [];
+  let currentRow = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    
+    if (ch === '"') {
+      currentRow += ch;
+      // check for escaped quote
+      if (inQuotes && text[i + 1] === '"') {
+        currentRow += '"';
+        i++; // skip next quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if ((ch === '\n' || ch === '\r') && inQuotes) {
+      // preserve line breaks inside quoted fields
+      currentRow += ch;
+      if (ch === '\r' && text[i + 1] === '\n') {
+        i++; // skip \n in \r\n
+      }
+    } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+      // end of row
+      if (currentRow.trim()) {
+        rows.push(parseCSVLine(currentRow));
+      }
+      currentRow = '';
+      if (ch === '\r' && text[i + 1] === '\n') {
+        i++; // skip \n in \r\n
+      }
+    } else {
+      currentRow += ch;
+    }
+  }
+  
+  // add last row if exists
+  if (currentRow.trim()) {
+    rows.push(parseCSVLine(currentRow));
+  }
+  
+  return rows;
+}
+
 // utility: parse a CSV line supporting quoted fields and commas inside quotes
 function parseCSVLine(line) {
   const cols = [];
@@ -329,6 +376,6 @@ function parseCSVLine(line) {
     }
   }
   cols.push(cur);
-  // trim surrounding whitespace
+  // trim surrounding whitespace but preserve internal formatting
   return cols.map(s => s.trim());
 }
