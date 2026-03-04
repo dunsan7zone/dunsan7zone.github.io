@@ -11509,6 +11509,30 @@ footer a:hover, footer a:active, footer a:focus {
   text-decoration: none;
 }
 
+.phone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #198754;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: rgba(25, 135, 84, 0.1);
+  transition: all 0.2s ease;
+  word-break: break-all;
+  font-weight: 500;
+}
+
+.phone-link:hover {
+  color: #ffffff;
+  background-color: #198754;
+  text-decoration: none;
+}
+
+.phone-link i {
+  font-size: 14px;
+}
+
 .url-previews {
   display: flex;
   flex-direction: column;

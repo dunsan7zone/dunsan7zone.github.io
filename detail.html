@@ -94,26 +94,51 @@
             return str.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
         }
         
-        // 본문에서 URL을 감지하고 링크 + 썸네일로 변환
+        // 본문에서 URL과 전화번호를 감지하고 링크로 변환
         function renderContentWithLinks(text, container) {
             if (!text) return;
             
             const normalized = normalizeNewlines(text);
             const escaped = escapeHtml(normalized);
             
-            // URL 정규표현식
-            const urlRegex = /(https?:\/\/[^\s<>\"]+)/g;
+            // URL과 전화번호 정규표현식 (000-0000-0000, 11자리 숫자, http(s) URL)
+            const combinedRegex = /(\d{3}-\d{4}-\d{4}|\d{11}|https?:\/\/[^\s<>\"]+)/g;
+            
+            // 매칭된 항목들을 추적
             const urls = [];
+            const phones = [];
             let match;
             
-            while ((match = urlRegex.exec(escaped)) !== null) {
-                urls.push(match[1]);
+            // 모든 매칭 찾기
+            while ((match = combinedRegex.exec(escaped)) !== null) {
+                if (/^\d{3}-\d{4}-\d{4}$/.test(match[1])) {
+                    phones.push(match[1]);
+                } else if (/^\d{11}$/.test(match[1])) {
+                    phones.push(match[1]);
+                } else if (/^https?:\/\//.test(match[1])) {
+                    urls.push(match[1]);
+                }
             }
             
-            // URL을 링크로 변환
+            // URL과 전화번호를 한 번에 링크로 변환
             const contentHtml = escaped.replace(
-                /(https?:\/\/[^\s<>\"]+)/g,
-                '<a href="$1" target="_blank" class="url-link" rel="noopener noreferrer">$1</a>'
+                /(\d{3}-\d{4}-\d{4}|\d{11}|https?:\/\/[^\s<>\"]+)/g,
+                (match) => {
+                    // 전화번호 패턴 000-0000-0000
+                    if (/^\d{3}-\d{4}-\d{4}$/.test(match)) {
+                        const cleanPhone = match.replace(/-/g, '');
+                        return '<a href="tel:' + cleanPhone + '" class="phone-link"><i class="bi bi-telephone-fill"></i> ' + match + '</a>';
+                    }
+                    // 전화번호 패턴 11자리
+                    else if (/^\d{11}$/.test(match)) {
+                        return '<a href="tel:' + match + '" class="phone-link"><i class="bi bi-telephone-fill"></i> ' + match + '</a>';
+                    }
+                    // URL 패턴
+                    else if (/^https?:\/\//.test(match)) {
+                        return '<a href="' + match + '" target="_blank" class="url-link" rel="noopener noreferrer">' + match + '</a>';
+                    }
+                    return match;
+                }
             );
             
             // 본문 div 생성
@@ -122,7 +147,7 @@
             textPar.className = 'mb-4 content-text';
             container.appendChild(textPar);
             
-            // 발견된 URL들에 대해 썸네일 미리보기 생성
+            // URL 미리보기 카드 생성
             if (urls.length > 0) {
                 const previewContainer = document.createElement('div');
                 previewContainer.className = 'url-previews mb-4';
