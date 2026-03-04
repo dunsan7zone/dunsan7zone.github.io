@@ -172,7 +172,6 @@ function loadBoard(csvPath = 'data/notice.csv') {
       window.boardData = lines;
       renderBoard();
       renderRecentNotices();
-      renderAgreeDocFromNotice();
 
       // attach search handlers once
       const searchInput = document.getElementById('boardSearch');
@@ -192,10 +191,6 @@ function loadBoard(csvPath = 'data/notice.csv') {
     .catch(err => {
       console.error('Failed to load board CSV:', err);
       console.info('If you are opening via file://, fetching local files is blocked. Use a local web server (e.g. Live Server extension).');
-      const agreeDocBody = document.getElementById('agreeDocBody');
-      if (agreeDocBody) {
-        agreeDocBody.textContent = '동의서 작성 방법 안내를 불러오지 못했습니다.';
-      }
       const tbody = document.querySelector('#boardTable tbody');
       if (tbody && tbody.children.length === 0) {
         const trErr = document.createElement('tr');
@@ -318,109 +313,6 @@ function renderRecentNotices() {
     noticeCard.innerHTML = cardContent;
     container.appendChild(noticeCard);
   });
-}
-
-function renderAgreeDocFromNotice() {
-  const bodyEl = document.getElementById('agreeDocBody');
-  if (!bodyEl) return;
-
-  const data = window.boardData || [];
-  const target = data.find(cols => String(cols[0]).trim() === '4');
-
-  if (!target || !target[4]) {
-    bodyEl.textContent = '동의서 작성 방법 안내가 아직 등록되지 않았습니다.';
-    return;
-  }
-
-  const content = String(target[4])
-    .replace(/\\n/g, '\n')
-    .replace(/\\r/g, '\r')
-    .trim();
-
-  bodyEl.innerHTML = formatAgreeDocContent(content);
-}
-
-function escapeHtmlText(text) {
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function formatAgreeDocContent(content) {
-  const blocks = content
-    .split(/\n\s*\n+/)
-    .map(block => block.trim())
-    .filter(Boolean);
-
-  if (blocks.length === 0) {
-    return '<p class="agree-doc-paragraph">안내 내용이 없습니다.</p>';
-  }
-
-  const numberedPattern = /^(\d+\s*[).]|[0-9]+️⃣|[①-⑳]|[ㄱ-ㅎ]\.)/;
-  const emphasisPattern = /^(➡️|✅|※|중요[:：]?)/;
-
-  let html = '';
-
-  blocks.forEach((block, index) => {
-    const lines = block
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(Boolean);
-
-    if (lines.length === 0) return;
-
-    const first = lines[0];
-    const rest = lines.slice(1);
-
-    if (index === 0) {
-      html += `<div class="agree-doc-lead">${escapeHtmlText(first)}</div>`;
-      if (rest.length > 0) {
-        html += `<p class="agree-doc-paragraph">${escapeHtmlText(rest.join(' '))}</p>`;
-      }
-      return;
-    }
-
-    if (numberedPattern.test(first)) {
-      html += '<div class="agree-doc-item">';
-      html += `<div class="agree-doc-item-title">${escapeHtmlText(first)}</div>`;
-
-      if (rest.length > 0) {
-        html += '<ul class="agree-doc-list">';
-        rest.forEach(line => {
-          html += `<li>${escapeHtmlText(line)}</li>`;
-        });
-        html += '</ul>';
-      }
-
-      html += '</div>';
-      return;
-    }
-
-    if (emphasisPattern.test(first)) {
-      html += '<div class="agree-doc-highlight">';
-      html += `<div class="agree-doc-highlight-text">${escapeHtmlText(lines.join(' '))}</div>`;
-      html += '</div>';
-      return;
-    }
-
-    if (lines.length > 1) {
-      html += '<div class="agree-doc-item">';
-      html += `<div class="agree-doc-item-title">${escapeHtmlText(first)}</div>`;
-      html += '<ul class="agree-doc-list">';
-      rest.forEach(line => {
-        html += `<li>${escapeHtmlText(line)}</li>`;
-      });
-      html += '</ul></div>';
-      return;
-    }
-
-    html += `<p class="agree-doc-paragraph">${escapeHtmlText(first)}</p>`;
-  });
-
-  return html;
 }
 
 // utility: parse entire CSV text with support for line breaks in quoted fields

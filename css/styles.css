@@ -11979,6 +11979,65 @@ footer a:hover, footer a:active, footer a:focus {
   line-height: 1.7;
 }
 
+.agree-doc-photo-gallery {
+  margin-top: 12px;
+}
+
+.agree-doc-photo-track {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 2px 8px;
+}
+
+.agree-doc-photo-track::-webkit-scrollbar {
+  height: 8px;
+}
+
+.agree-doc-photo-track::-webkit-scrollbar-thumb {
+  background: #cfd8e3;
+  border-radius: 10px;
+}
+
+.agree-doc-photo-track::-webkit-scrollbar-track {
+  background: #eef2f7;
+  border-radius: 10px;
+}
+
+.agree-doc-photo-link {
+  flex: 0 0 220px;
+  aspect-ratio: 3 / 4;
+  scroll-snap-align: start;
+  border-radius: 10px;
+  border: 1px solid #e5eaf2;
+  background: #0b0f19;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.agree-doc-photo-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.14);
+}
+
+.agree-doc-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #0b0f19;
+}
+
+.agree-doc-photo-tip {
+  margin: 6px 2px 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 576px) {
   .agree-doc-header {
     padding: 12px 14px;
@@ -11995,5 +12054,13 @@ footer a:hover, footer a:active, footer a:focus {
   .agree-doc-item,
   .agree-doc-highlight {
     padding: 10px 12px;
+  }
+
+  .agree-doc-photo-link {
+    flex-basis: 170px;
+  }
+
+  .agree-doc-photo-tip {
+    font-size: 0.76rem;
   }
 }
