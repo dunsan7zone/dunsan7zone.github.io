@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>새 페이지 템플릿</title>
+
+    <!-- 1) 공통 버전 로드 (반드시 먼저) -->
+    <script src="js/version.js"></script>
+
+    <!-- 2) CSS에 버전 쿼리 자동 부착 -->
+    <script>
+        document.write('<link href="css/styles.css?v=' + encodeURIComponent(window.APP_VERSION || 'dev') + '" rel="stylesheet" />');
+    </script>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="mb-3">새 페이지</h1>
+        <p id="status" class="text-muted">데이터 로딩 중...</p>
+    </div>
+
+    <script>
+        const APP_VERSION = window.APP_VERSION || 'dev';
+
+        function appendVersion(url) {
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}v=${encodeURIComponent(APP_VERSION)}`;
+        }
+
+        async function loadData() {
+            const status = document.getElementById('status');
+            try {
+                const response = await fetch(appendVersion('data/notice.csv'), { cache: 'no-store' });
+                if (!response.ok) throw new Error('데이터 로드 실패');
+                const text = await response.text();
+                status.textContent = `데이터 로드 완료 (${text.length} chars)`;
+            } catch (error) {
+                console.error(error);
+                status.textContent = '데이터 로드 오류';
+            }
+        }
+
+        loadData();
+    </script>
+
+    <!-- 3) JS에 버전 쿼리 자동 부착 -->
+    <script>
+        document.write('<script src="js/scripts.js?v=' + encodeURIComponent(window.APP_VERSION || 'dev') + '"><\\/script>');
+    </script>
+</body>
+</html>

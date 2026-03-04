@@ -53,3 +53,31 @@ window.APP_VERSION = '20260304-1';
 ### Q. 그래도 반영이 느릴 수 있나요?
 네. GitHub Pages 배포 자체가 1~2분 정도 지연될 수 있습니다.
 배포 완료 후에는 버전 갱신 덕분에 모바일에서도 최신 파일이 잘 반영됩니다.
+
+---
+
+## 6) 새 HTML/JS/데이터 파일 추가할 때
+
+### 가장 쉬운 방법 (권장)
+- `new-page-template.html`을 복사해서 새 페이지를 만드세요.
+- 이 템플릿에는 아래가 이미 포함되어 있습니다.
+  - `js/version.js` 선로드
+  - `css/styles.css?v=...` 자동 버전 부착
+  - `js/scripts.js?v=...` 자동 버전 부착
+  - `fetch(..., { cache: 'no-store' })` + 버전 쿼리 예시
+
+### 규칙
+1. 새 HTML 파일
+	- 반드시 `js/version.js`를 먼저 로드
+	- CSS/JS 파일은 `?v=APP_VERSION` 붙여서 로드
+2. 새 데이터 fetch (csv/json 등)
+	- `appendVersion(url)` 사용
+	- `fetch(..., { cache: 'no-store' })` 사용
+3. 배포 직전
+	- `js/version.js` 버전 1 증가 후 푸시
+
+### 빠른 체크리스트
+- [ ] 새 페이지가 `js/version.js`를 읽는가?
+- [ ] 새 CSS/JS URL에 버전 쿼리가 붙는가?
+- [ ] 새 fetch 요청에 버전 + `no-store`가 있는가?
+- [ ] 배포 전 `js/version.js` 값 올렸는가?
