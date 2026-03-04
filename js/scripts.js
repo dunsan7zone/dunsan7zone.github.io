@@ -282,12 +282,28 @@ function renderRecentNotices() {
   
   const recent = sorted.slice(0, 3);
   
-  recent.forEach(cols => {
-    const a = document.createElement('a');
-    a.href = `detail.html?id=${encodeURIComponent(cols[0])}`;
-    a.className = 'btn btn-outline-secondary w-100 text-start text-truncate p-2';
-    a.textContent = `[${cols[0]}] ${cols[1]}`;
-    container.appendChild(a);
+  recent.forEach((cols, index) => {
+    const noticeCard = document.createElement('a');
+    noticeCard.href = `detail.html?id=${encodeURIComponent(cols[0])}`;
+    noticeCard.className = 'notice-card';
+    
+    // Create card content
+    const cardContent = `
+      <div class="notice-card-number">${cols[0]}</div>
+      <div class="notice-card-body">
+        <div class="notice-card-title">${cols[1]}</div>
+        <div class="notice-card-date">
+          <i class="bi bi-calendar3"></i>
+          ${cols[3]}
+        </div>
+      </div>
+      <div class="notice-card-arrow">
+        <i class="bi bi-chevron-right"></i>
+      </div>
+    `;
+    
+    noticeCard.innerHTML = cardContent;
+    container.appendChild(noticeCard);
   });
 }
 
