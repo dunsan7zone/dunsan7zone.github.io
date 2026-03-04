@@ -21,6 +21,48 @@
         <div id="detailContent"></div>
     </div>
     <script>
+        // CSV 파서: 큰따옴표 안의 줄바꿈을 포함한 전체 텍스트 파싱
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                
+                if (ch === '"') {
+                    currentRow += ch;
+                    if (inQuotes && text[i + 1] === '"') {
+                        currentRow += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if ((ch === '\n' || ch === '\r') && inQuotes) {
+                    currentRow += ch;
+                    if (ch === '\r' && text[i + 1] === '\n') {
+                        i++;
+                    }
+                } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+                    if (currentRow.trim()) {
+                        rows.push(parseCSVLine(currentRow));
+                    }
+                    currentRow = '';
+                    if (ch === '\r' && text[i + 1] === '\n') {
+                        i++;
+                    }
+                } else {
+                    currentRow += ch;
+                }
+            }
+            
+            if (currentRow.trim()) {
+                rows.push(parseCSVLine(currentRow));
+            }
+            
+            return rows;
+        }
+
         // simple CSV line parser that supports quoted fields
         function parseCSVLine(line) {
             const cols = [];
@@ -68,11 +110,10 @@
                 })
                 .then(text => {
                     console.log('csv text length', text.length);
-                    const lines = text.trim().split(/\r?\n/);
+                    const lines = parseCSV(text.trim());
                     if (lines.length > 0) lines.shift(); // drop header
                     let found = null;
-                    lines.forEach(line => {
-                        const cols = parseCSVLine(line);
+                    lines.forEach(cols => {
                         if (cols[0] === id) {
                             found = cols;
                         }
