@@ -207,6 +207,140 @@
             const params = new URLSearchParams(location.search);
             return params.get(name);
         }
+        
+        // 이미지 캐러셀 렌더링
+        function renderImageCarousel(imageNames, noticeId, container) {
+            if (!imageNames || imageNames.length === 0) return;
+            
+            // 유효한 이미지만 필터링
+            const validImages = imageNames.map(name => ({
+                name: name,
+                src: `notice_img/${encodeURIComponent(noticeId)}_${encodeURIComponent(name)}`
+            }));
+            
+            if (validImages.length === 0) return;
+            
+            // 캐러셀 래퍼
+            const carouselWrapper = document.createElement('div');
+            carouselWrapper.className = 'image-carousel-wrapper mb-4';
+            
+            // HTML 생성
+            let html = '<div class="image-carousel">';
+            
+            validImages.forEach((img, index) => {
+                html += `<div class="carousel-slide ${index === 0 ? 'active' : ''}">
+                    <img class="carousel-image" src="${escapeHtml(img.src)}" alt="${escapeHtml(img.name)}" data-full-src="${escapeHtml(img.src)}">
+                </div>`;
+            });
+            
+            html += '</div>';
+            
+            // 이미지가 1개 이상일 때만 컨트롤 표시
+            if (validImages.length > 1) {
+                html += `
+                    <div class="carousel-controls">
+                        <button class="carousel-btn prev" title="이전 이미지"><i class="bi bi-chevron-left"></i></button>
+                        <div class="carousel-counter"><span class="current">1</span> / <span class="total">${validImages.length}</span></div>
+                        <button class="carousel-btn next" title="다음 이미지"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                `;
+            }
+            
+            html += '<p class="carousel-tip text-center text-muted small mt-2"><i class="bi bi-search"></i> 사진을 클릭하면 크게 볼 수 있습니다</p>';
+            
+            carouselWrapper.innerHTML = html;
+            container.appendChild(carouselWrapper);
+            
+            // 슬라이드 컨트롤 기능
+            const carousel = carouselWrapper.querySelector('.image-carousel');
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const prevBtn = carouselWrapper.querySelector('.carousel-btn.prev');
+            const nextBtn = carouselWrapper.querySelector('.carousel-btn.next');
+            const currentSpan = carouselWrapper.querySelector('.current');
+            
+            let currentIndex = 0;
+            
+            function showSlide(index) {
+                if (index < 0) currentIndex = slides.length - 1;
+                else if (index >= slides.length) currentIndex = 0;
+                
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[currentIndex].classList.add('active');
+                
+                if (currentSpan) {
+                    currentSpan.textContent = currentIndex + 1;
+                }
+            }
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    currentIndex--;
+                    showSlide(currentIndex);
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    currentIndex++;
+                    showSlide(currentIndex);
+                });
+            }
+            
+            // 이미지 클릭 시 크게보기
+            slides.forEach(slide => {
+                const img = slide.querySelector('.carousel-image');
+                if (img) {
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', () => {
+                        showImageModal(img.getAttribute('data-full-src'), img.alt);
+                    });
+                }
+            });
+            
+            // 이미지 로드 에러 처리
+            slides.forEach((slide, index) => {
+                const img = slide.querySelector('img');
+                img.onerror = () => {
+                    img.style.display = 'none';
+                    slide.innerHTML = '<div class="carousel-placeholder">이미지를 불러올 수 없습니다</div>';
+                };
+            });
+        }
+        
+        // 이미지 모달 표시
+        function showImageModal(imageSrc, imageAlt) {
+            let modal = document.getElementById('imageModal');
+            
+            if (!modal) {
+                // 모달 처음 생성
+                modal = document.createElement('div');
+                modal.id = 'imageModal';
+                modal.className = 'image-modal';
+                modal.innerHTML = `
+                    <div class="image-modal-content">
+                        <button class="image-modal-close"><i class="bi bi-x-lg"></i></button>
+                        <img class="image-modal-img" src="" alt="확대 이미지">
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // 닫기 버튼
+                modal.querySelector('.image-modal-close').addEventListener('click', () => {
+                    modal.classList.remove('show');
+                });
+                
+                // 배경 클릭 시 닫기
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('show');
+                    }
+                });
+            }
+            
+            modal.querySelector('.image-modal-img').src = imageSrc;
+            modal.querySelector('.image-modal-img').alt = imageAlt;
+            modal.classList.add('show');
+        }
         function loadDetail(csvPath = 'data/notice.csv') {
             const id = getParam('id');
             if (!id) {
@@ -261,30 +395,7 @@
                     // images (now at index 5)
                     if (found.length > 5 && found[5]) {
                         const names = found[5].split(/[|,]/).map(s=>s.trim()).filter(Boolean);
-                        if (names.length > 0) {
-                            const imgWrapper = document.createElement('div');
-                            imgWrapper.className = 'mb-3';
-                            let anyVisible = false;
-                            names.forEach(name => {
-                                const img = document.createElement('img');
-                                img.src = `notice_img/${encodeURIComponent(found[0])}_${encodeURIComponent(name)}`;
-                                console.log('creating img', img.src);
-                                img.alt = name;
-                                img.className = 'img-fluid mb-2';
-                                img.onerror = () => { img.style.display = 'none'; console.warn('image failed', img.src); };
-                                img.onload = () => { anyVisible = true; console.log('image loaded', img.src); };
-                                imgWrapper.appendChild(img);
-                            });
-                            setTimeout(() => {
-                                if (!anyVisible) {
-                                    const placeholder = document.createElement('p');
-                                    placeholder.className = 'text-muted';
-                                    placeholder.textContent = '(이미지 없음)';
-                                    imgWrapper.appendChild(placeholder);
-                                }
-                            }, 500);
-                            body.appendChild(imgWrapper);
-                        }
+                        renderImageCarousel(names, found[0], body);
                     }
 
                     card.appendChild(body);
