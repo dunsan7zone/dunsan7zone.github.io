@@ -477,6 +477,21 @@ function renderAgreementRate() {
     homeAgreementRateProgressBar.setAttribute('aria-valuenow', data.overallRate);
   }
 
+  const buildingUnitSummary = document.getElementById('buildingUnitSummary');
+  if (buildingUnitSummary && data.buildings) {
+    const hyangchon = data.buildings.find(b => b.name === '향촌 아파트');
+    const parangsae = data.buildings.find(b => b.name === '파랑새 아파트');
+
+    const hyangchonText = hyangchon
+      ? `향촌 아파트: ${hyangchon.agreedUnits}/${hyangchon.totalUnits}`
+      : '향촌 아파트: -/-';
+    const parangsaeText = parangsae
+      ? `파랑새 아파트: ${parangsae.agreedUnits}/${parangsae.totalUnits}`
+      : '파랑새 아파트: -/-';
+
+    buildingUnitSummary.textContent = `${hyangchonText}  |  ${parangsaeText}`;
+  }
+
   // Render chart
   renderAgreementChart();
   

@@ -6,25 +6,25 @@
       "agreedUnits": 0,
       "agreedRate": -1,
       "dongs": [
-        { "name": "101동", "totalUnits": 60, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "102동", "totalUnits": 60, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "103동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "104동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "105동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "106동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "107동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "108동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "109동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "110동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "111동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "112동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "113동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "114동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "115동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "116동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "117동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "118동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "119동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 }
+        { "name": "101", "totalUnits": 60, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "102", "totalUnits": 60, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "103", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "104", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "105", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "106", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "107", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "108", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "109", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "110", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "111", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "112", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "113", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "114", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "115", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "116", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "117", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "118", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "119", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 }
       ]
     },
     {
@@ -33,10 +33,10 @@
       "agreedUnits": 0,
       "agreedRate": -1,
       "dongs": [
-        { "name": "101동", "totalUnits": 120, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "102동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "103동", "totalUnits": 84, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "104동", "totalUnits": 112, "agreedUnits": 0, "agreedRate": -1 }
+        { "name": "101", "totalUnits": 120, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "102", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "103", "totalUnits": 84, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "104", "totalUnits": 112, "agreedUnits": 0, "agreedRate": -1 }
       ]
     }
   ],

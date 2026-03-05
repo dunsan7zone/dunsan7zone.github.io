@@ -176,6 +176,7 @@
                     <div class="col-12">
                         <div class="card shadow-sm p-4">
                             <h5 class="mb-4">아파트별 동의율</h5>
+                            <div id="buildingUnitSummary" class="small text-muted mb-3"></div>
                             <div style="overflow-x: auto; overflow-y: hidden;">
                                 <div class="chart-container-wrapper" style="min-width: 300px; height: 400px; position: relative;">
                                     <canvas id="agreementChart"></canvas>
@@ -220,8 +221,8 @@
                                             <thead style="position: sticky; top: 0; background-color: white; z-index: 10;">
                                                 <tr>
                                                     <th>동</th>
-                                                    <th>세대 수</th>
-                                                    <th>동의 수</th>
+                                                    <th>세대<br>수</th>
+                                                    <th>동의<br>수</th>
                                                     <th>동의율</th>
                                                 </tr>
                                             </thead>
@@ -230,15 +231,15 @@
                                         </table>
                                     </div>
                                 </div>
-                                <div class="col-12 col-lg-6">
+                                <div class="col-12 col-lg-6 agreement-split-col">
                                     <h6 class="mb-3 fw-bold">파랑새 아파트</h6>
                                     <div class="agreement-table-scroll">
                                         <table class="table table-striped" id="parangsaeAgreementTable">
                                             <thead style="position: sticky; top: 0; background-color: white; z-index: 10;">
                                                 <tr>
                                                     <th>동</th>
-                                                    <th>세대 수</th>
-                                                    <th>동의 수</th>
+                                                    <th>세대<br>수</th>
+                                                    <th>동의<br>수</th>
                                                     <th>동의율</th>
                                                 </tr>
                                             </thead>

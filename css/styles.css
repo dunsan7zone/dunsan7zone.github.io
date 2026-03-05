@@ -12261,6 +12261,61 @@ footer a:hover, footer a:active, footer a:focus {
   overflow-y: auto;
 }
 
+#hyangchonAgreementTable thead th,
+#parangsaeAgreementTable thead th {
+  font-size: 0.9rem;
+  text-align: center !important;
+  vertical-align: middle;
+  border-right: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+#hyangchonAgreementTable thead th:first-child,
+#parangsaeAgreementTable thead th:first-child {
+  border-left: 1px solid #dee2e6;
+}
+
+#hyangchonAgreementTable,
+#parangsaeAgreementTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#hyangchonAgreementTable thead th:nth-child(1),
+#parangsaeAgreementTable thead th:nth-child(1) {
+  width: calc((100% - 30%) / 3);
+}
+
+#hyangchonAgreementTable thead th:nth-child(2),
+#hyangchonAgreementTable thead th:nth-child(3),
+#parangsaeAgreementTable thead th:nth-child(2),
+#parangsaeAgreementTable thead th:nth-child(3) {
+  width: calc((100% - 30%) / 3);
+  white-space: nowrap;
+  word-break: normal;
+  line-height: 1.2;
+}
+
+#hyangchonAgreementTable thead th:nth-child(4),
+#parangsaeAgreementTable thead th:nth-child(4) {
+  width: 30%;
+  white-space: nowrap;
+}
+
+.agreement-split-col {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+@media (min-width: 992px) {
+  .agreement-split-col {
+    border-top: 0;
+    border-left: 1px solid #dee2e6;
+    padding-top: 0;
+    padding-left: calc(var(--bs-gutter-x) * 0.5 + 0.75rem);
+  }
+}
+
 @media (max-width: 767.98px) {
   .agreement-table-scroll {
     max-height: 450px;
