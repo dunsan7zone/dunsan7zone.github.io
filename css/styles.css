@@ -12307,9 +12307,14 @@ footer a:hover, footer a:active, footer a:focus {
   padding-top: 1rem;
 }
 
-/* Parangsae chart card height adjustment */
+/* Parangsae chart card height and width */
 .row > .col-12.col-lg-4 .card {
-  min-height: 512.8px;
+  height: 100%;
+}
+
+/* Parangsae chart width */
+#parangsaeDongChart {
+  width: 100% !important;
 }
 
 @media (min-width: 992px) {
