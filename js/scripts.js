@@ -242,6 +242,13 @@ function renderBoard(filterText = '', field = 'title') {
     return title.indexOf(q) !== -1;
   });
 
+  // sort by number (col[0]) in descending order (newest first)
+  results.sort((a, b) => {
+    const numA = parseInt(a[0]) || 0;
+    const numB = parseInt(b[0]) || 0;
+    return numB - numA;
+  });
+
   // render matched rows
   results.forEach(cols => {
     const tr = document.createElement('tr');
