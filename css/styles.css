@@ -242,13 +242,21 @@ dl {
     flex-direction: row !important;
     overflow-x: auto;
     white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  #navbarResponsive .navbar-nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
   #navbarResponsive .nav-item {
     flex: 0 0 auto;
   }
   #navbarResponsive .nav-link {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  #navbarResponsive .nav-link img {
+    width: 70px !important;
   }
 }
 
@@ -258,13 +266,21 @@ dl {
     flex-direction: row !important;
     overflow-x: auto;
     white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  #navbarResponsive .navbar-nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
   #navbarResponsive .nav-item {
     flex: 0 0 auto;
   }
   #navbarResponsive .nav-link {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  #navbarResponsive .nav-link img {
+    width: 70px !important;
   }
 }
 
