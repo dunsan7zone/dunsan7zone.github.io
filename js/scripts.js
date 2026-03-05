@@ -489,7 +489,7 @@ function renderAgreementRate() {
       ? `파랑새 아파트: ${parangsae.agreedUnits}/${parangsae.totalUnits}`
       : '파랑새 아파트: -/-';
 
-    buildingUnitSummary.textContent = `${hyangchonText}  |  ${parangsaeText}`;
+    buildingUnitSummary.innerHTML = `${hyangchonText}<br>${parangsaeText}`;
   }
 
   // Render chart
