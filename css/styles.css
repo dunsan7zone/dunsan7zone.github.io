@@ -261,49 +261,77 @@ dl {
 
 /* mobile collapse menu should scroll horizontally instead of vertical stack */
 @media (max-width: 991.98px) {
+  #navbarResponsive {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
   #navbarResponsive .navbar-nav {
     flex-direction: row !important;
     overflow-x: auto;
     white-space: nowrap;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #adb5bd transparent;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    align-items: center;
   }
   #navbarResponsive .navbar-nav::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+    height: 6px;
+  }
+  #navbarResponsive .navbar-nav::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 999px;
+  }
+  #navbarResponsive .navbar-nav::-webkit-scrollbar-track {
+    background: transparent;
   }
   #navbarResponsive .nav-item {
     flex: 0 0 auto;
   }
   #navbarResponsive .nav-link {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-  }
-  #navbarResponsive .nav-link img {
-    width: 70px !important;
   }
 }
 
 /* ensure smaller devices also get horizontal menu */
 @media (max-width: 768px) {
+  #navbarResponsive {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
+
   #navbarResponsive .navbar-nav {
     flex-direction: row !important;
     overflow-x: auto;
     white-space: nowrap;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #adb5bd transparent;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    align-items: center;
   }
   #navbarResponsive .navbar-nav::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+    height: 6px;
+  }
+  #navbarResponsive .navbar-nav::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 999px;
+  }
+  #navbarResponsive .navbar-nav::-webkit-scrollbar-track {
+    background: transparent;
   }
   #navbarResponsive .nav-item {
     flex: 0 0 auto;
   }
   #navbarResponsive .nav-link {
+    padding-top: 0.2rem !important;
+    padding-bottom: 0.2rem !important;
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
-  }
-  #navbarResponsive .nav-link img {
-    width: 70px !important;
   }
 }
 

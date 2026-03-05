@@ -835,40 +835,39 @@ function renderAgreementTable() {
   const data = window.agreementRateData;
   if (!data || !data.buildings) return;
 
-  const tbody = document.getElementById('agreementTableBody');
-  if (!tbody) return;
+  const hyangchonTbody = document.getElementById('hyangchonAgreementTableBody');
+  const parangsaeTbody = document.getElementById('parangsaeAgreementTableBody');
+  if (!hyangchonTbody || !parangsaeTbody) return;
 
-  tbody.innerHTML = '';
-  
-  // Render dong-wise data for each building
-  data.buildings.forEach(building => {
-    if (!building.dongs) return;
-    
-    building.dongs.forEach(dong => {
+  hyangchonTbody.innerHTML = '';
+  parangsaeTbody.innerHTML = '';
+
+  function appendDongRows(tbody, dongs) {
+    if (!dongs) return;
+
+    dongs.forEach(dong => {
       const tr = document.createElement('tr');
-      
-      // Check if data is unknown (-1)
+
       const isUnknown = dong.agreedRate === -1;
       const displayRate = isUnknown ? 0 : dong.agreedRate;
       const displayText = isUnknown ? '? %' : dong.agreedRate.toFixed(1) + '%';
-      
-      // Color based on rate
-      let barColor = 'bg-secondary'; // for unknown
+
+      let barColor = 'bg-secondary';
       let textColor = '#212529';
-      
+
       if (!isUnknown) {
         if (displayRate <= 30) {
-          barColor = 'bg-danger'; // 빨강
-          textColor = '#212529'; // 최저 구간은 검정
+          barColor = 'bg-danger';
+          textColor = '#212529';
         } else if (displayRate <= 80) {
-          barColor = 'bg-warning'; // 노랑
-          textColor = '#fff'; // 그 이상부터 흰색
+          barColor = 'bg-warning';
+          textColor = '#fff';
         } else {
-          barColor = 'bg-primary'; // 파랑
-          textColor = '#fff'; // 그 이상부터 흰색
+          barColor = 'bg-primary';
+          textColor = '#fff';
         }
       }
-      
+
       tr.innerHTML = `
         <td>${dong.name}</td>
         <td>${dong.totalUnits}</td>
@@ -882,6 +881,12 @@ function renderAgreementTable() {
       `;
       tbody.appendChild(tr);
     });
-  });
+  }
+
+  const hyangchon = data.buildings.find(b => b.name === '향촌 아파트');
+  const parangsae = data.buildings.find(b => b.name === '파랑새 아파트');
+
+  appendDongRows(hyangchonTbody, hyangchon && hyangchon.dongs);
+  appendDongRows(parangsaeTbody, parangsae && parangsae.dongs);
 }
 
