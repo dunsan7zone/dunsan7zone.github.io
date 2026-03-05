@@ -208,11 +208,27 @@ dl {
   opacity: 1;
 }
 
-/* ensure all carousel items are centered */
+/* normalize masthead carousel sizing/alignment */
+#mastheadCarousel,
+#mastheadCarousel .carousel-inner,
 #mastheadCarousel .carousel-item {
-  display: flex !important;
+  height: 100% !important;
+}
+
+#mastheadCarousel .carousel-item.active,
+#mastheadCarousel .carousel-item-next,
+#mastheadCarousel .carousel-item-prev {
+  display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#mastheadCarousel .carousel-item img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
 }
 
 /* top logo: fade out toward bottom */
@@ -12156,7 +12172,28 @@ footer a:hover, footer a:active, footer a:focus {
 /* Carousel height adjustment for mobile */
 @media (max-width: 767.98px) {
   #mastheadCarousel {
-    height: 600px !important;
+    height: 520px !important;
+  }
+}
+
+@media (max-width: 500px) {
+  #mastheadCarousel {
+    height: 440px !important;
+  }
+
+  #mastheadCarousel .carousel-inner,
+  #mastheadCarousel .carousel-item {
+    height: 100% !important;
+  }
+
+  #mastheadCarousel .carousel-item img {
+    display: block;
+    margin: 0 auto;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
   }
 }
 
