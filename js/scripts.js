@@ -168,6 +168,9 @@ window.addEventListener('DOMContentLoaded', event => {
 
   // load board data from CSV
   loadBoard();
+  
+  // load agreement rate data
+  loadAgreementRate();
 });
 
 /**
@@ -413,3 +416,472 @@ function parseCSVLine(line) {
   // trim surrounding whitespace but preserve internal formatting
   return cols.map(s => s.trim());
 }
+
+/**
+ * Load agreement rate data from JSON
+ */
+function loadAgreementRate(jsonPath = 'data/agreementrate.json') {
+  fetch(appendVersion(jsonPath), { cache: 'no-store' })
+    .then(resp => {
+      if (!resp.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return resp.json();
+    })
+    .then(data => {
+      window.agreementRateData = data;
+      renderAgreementRate();
+    })
+    .catch(err => {
+      console.error('Failed to load agreement rate data:', err);
+      const container = document.getElementById('agreementrate');
+      if (container) {
+        container.innerHTML += '<div class="alert alert-danger" role="alert">동의율 데이터를 불러오는 중 오류가 발생했습니다.</div>';
+      }
+    });
+}
+
+/**
+ * Render agreement rate display with chart and table
+ */
+function renderAgreementRate() {
+  const data = window.agreementRateData;
+  if (!data) return;
+
+  // Update overall rate display in agreementrate section
+  const overallDisplay = document.getElementById('overallRateDisplay');
+  const overallProgress = document.getElementById('overallRateProgress');
+  if (overallDisplay && overallProgress) {
+    overallDisplay.textContent = data.overallRate.toFixed(1) + '%';
+    overallDisplay.style.color = '#E12727';
+    overallDisplay.style.textShadow = 'none';
+    overallDisplay.style.webkitTextStroke = '4px #ffffff';
+    overallDisplay.style.paintOrder = 'stroke fill';
+    overallDisplay.style.zIndex = '10';
+    overallDisplay.style.fontWeight = '900';
+
+    overallProgress.style.width = data.overallRate + '%';
+    overallProgress.setAttribute('aria-valuenow', data.overallRate);
+    overallProgress.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-primary', 'bg-secondary');
+    overallProgress.style.backgroundColor = getAgreementChartColor(data.overallRate);
+  }
+
+  // Update home button agreement rate display with progress bar
+  const homeAgreementRateDisplay = document.getElementById('homeAgreementRateDisplay');
+  const homeAgreementRateProgressBar = document.getElementById('homeAgreementRateProgressBar');
+  if (homeAgreementRateDisplay) {
+    homeAgreementRateDisplay.textContent = data.overallRate.toFixed(1) + '%';
+  }
+  if (homeAgreementRateProgressBar) {
+    homeAgreementRateProgressBar.style.width = data.overallRate + '%';
+    homeAgreementRateProgressBar.setAttribute('aria-valuenow', data.overallRate);
+  }
+
+  // Render chart
+  renderAgreementChart();
+  
+  // Render dong charts
+  renderHyangchonDongChart();
+  renderParangsaeDongChart();
+
+  // Render table
+  renderAgreementTable();
+}
+
+function getAgreementChartColor(rate) {
+  if (rate === -1) return '#6c757d';
+  if (rate <= 30) return '#dc3545';
+  if (rate <= 80) return '#fd7e14';
+  return '#28a745';
+}
+
+function getAgreementProgressClass(rate) {
+  if (rate === -1) return 'bg-secondary';
+  if (rate <= 30) return 'bg-danger';
+  if (rate <= 80) return 'bg-warning';
+  return 'bg-primary';
+}
+
+/**
+ * Render bar chart for building-wise agreement rates
+ */
+function renderAgreementChart() {
+  const data = window.agreementRateData;
+  if (!data || !data.buildings) return;
+
+  const ctx = document.getElementById('agreementChart');
+  if (!ctx) return;
+
+  // Destroy existing chart if any
+  if (window.agreementChartInstance) {
+    window.agreementChartInstance.destroy();
+    window.agreementChartInstance = null;
+  }
+
+  const labels = data.buildings.map(b => b.name);
+  const rates = data.buildings.map(b => b.agreedRate === -1 ? 0 : b.agreedRate);
+  const colors = data.buildings.map(b => getAgreementChartColor(b.agreedRate));
+
+  const originalRates = data.buildings.map(b => b.agreedRate);
+
+  window.agreementChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '동의율 (%)',
+        data: rates,
+        backgroundColor: colors,
+        borderColor: colors,
+        borderWidth: 1,
+        barPercentage: 0.5,
+        categoryPercentage: 0.5
+      }]
+    },
+    plugins: [ChartDataLabels],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          offset: function(context) {
+            const rate = originalRates[context.dataIndex];
+            return rate === -1 ? 10 : 4;
+          },
+          color: function(context) {
+            const rate = originalRates[context.dataIndex];
+            return rate === -1 ? '#2937f0' : '#111827';
+          },
+          font: function(context) {
+            const rate = originalRates[context.dataIndex];
+            return {
+              size: rate === -1 ? 30 : 12,
+              weight: 'bold'
+            };
+          },
+          formatter: function(value, context) {
+            const rate = originalRates[context.dataIndex];
+            return rate === -1 ? '?' : rate.toFixed(1) + '%';
+          }
+        },
+        annotation: {
+          annotations: {
+            line1: {
+              type: 'line',
+              yMin: 90,
+              yMax: 90,
+              borderColor: '#dc3545',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              label: {
+                display: false
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: true
+          }
+        },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: function(value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Render bar chart for Hyangchon dong-wise agreement rates
+ */
+function renderHyangchonDongChart() {
+  const data = window.agreementRateData;
+  if (!data || !data.buildings) return;
+
+  const ctx = document.getElementById('hyangchonDongChart');
+  if (!ctx) return;
+
+  // Find Hyangchon building
+  const hyangchon = data.buildings.find(b => b.name === '향촌 아파트');
+  if (!hyangchon || !hyangchon.dongs) return;
+
+  // Destroy existing chart if any
+  if (window.hyangchonDongChartInstance) {
+    window.hyangchonDongChartInstance.destroy();
+    window.hyangchonDongChartInstance = null;
+  }
+
+  const dongLabels = hyangchon.dongs.map(d => d.name.replace('향촌 ', ''));
+  const dongRates = hyangchon.dongs.map(d => d.agreedRate === -1 ? 0 : d.agreedRate);
+  const originalDongRates = hyangchon.dongs.map(d => d.agreedRate);
+  const dongColors = hyangchon.dongs.map(d => getAgreementChartColor(d.agreedRate));
+
+  // Use same style as Parangsae chart
+  const barPercentage = 0.8;
+  const categoryPercentage = 0.9;
+
+  window.hyangchonDongChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dongLabels,
+      datasets: [{
+        label: '동의율 (%)',
+        data: dongRates,
+        backgroundColor: dongColors,
+        borderColor: dongColors,
+        borderWidth: 1,
+        barPercentage: barPercentage,
+        categoryPercentage: categoryPercentage
+      }]
+    },
+    plugins: [ChartDataLabels],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          offset: function(context) {
+            const rate = originalDongRates[context.dataIndex];
+            return rate === -1 ? 10 : 4;
+          },
+          color: function(context) {
+            const rate = originalDongRates[context.dataIndex];
+            return rate === -1 ? '#2937f0' : '#111827';
+          },
+          font: function(context) {
+            const rate = originalDongRates[context.dataIndex];
+            return {
+              size: rate === -1 ? 30 : 12,
+              weight: 'bold'
+            };
+          },
+          formatter: function(value, context) {
+            const rate = originalDongRates[context.dataIndex];
+            return rate === -1 ? '?' : rate.toFixed(1) + '%';
+          }
+        },
+        annotation: {
+          annotations: {
+            line1: {
+              type: 'line',
+              yMin: 90,
+              yMax: 90,
+              borderColor: '#dc3545',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              label: {
+                display: false
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: true
+          }
+        },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: function(value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Render bar chart for Parangsae dong-wise agreement rates
+ */
+function renderParangsaeDongChart() {
+  const data = window.agreementRateData;
+  if (!data || !data.buildings) return;
+
+  const ctx = document.getElementById('parangsaeDongChart');
+  if (!ctx) return;
+
+  // Find Parangsae building
+  const parangsae = data.buildings.find(b => b.name === '파랑새 아파트');
+  if (!parangsae || !parangsae.dongs) return;
+
+  // Destroy existing chart if any
+  if (window.parangsaeDongChartInstance) {
+    window.parangsaeDongChartInstance.destroy();
+    window.parangsaeDongChartInstance = null;
+  }
+
+  const dongLabels = parangsae.dongs.map(d => d.name.replace('파랑새 ', ''));
+  const dongRates = parangsae.dongs.map(d => d.agreedRate === -1 ? 0 : d.agreedRate);
+  const originalDongRates = parangsae.dongs.map(d => d.agreedRate);
+  const dongColors = parangsae.dongs.map(d => getAgreementChartColor(d.agreedRate));
+
+  window.parangsaeDongChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dongLabels,
+      datasets: [{
+        label: '동의율 (%)',
+        data: dongRates,
+        backgroundColor: dongColors,
+        borderColor: dongColors,
+        borderWidth: 1,
+        barPercentage: 0.8,
+        categoryPercentage: 0.9
+      }]
+    },
+    plugins: [ChartDataLabels],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          offset: function(context) {
+            const rate = originalDongRates[context.dataIndex];
+            return rate === -1 ? 10 : 4;
+          },
+          color: function(context) {
+            const rate = originalDongRates[context.dataIndex];
+            return rate === -1 ? '#2937f0' : '#111827';
+          },
+          font: function(context) {
+            const rate = originalDongRates[context.dataIndex];
+            return {
+              size: rate === -1 ? 30 : 12,
+              weight: 'bold'
+            };
+          },
+          formatter: function(value, context) {
+            const rate = originalDongRates[context.dataIndex];
+            return rate === -1 ? '?' : rate.toFixed(1) + '%';
+          }
+        },
+        annotation: {
+          annotations: {
+            line1: {
+              type: 'line',
+              yMin: 90,
+              yMax: 90,
+              borderColor: '#dc3545',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              label: {
+                display: false
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: true
+          }
+        },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: function(value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+/**
+ * Render agreement rate details table
+ */
+function renderAgreementTable() {
+  const data = window.agreementRateData;
+  if (!data || !data.buildings) return;
+
+  const tbody = document.getElementById('agreementTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  
+  // Render dong-wise data for each building
+  data.buildings.forEach(building => {
+    if (!building.dongs) return;
+    
+    building.dongs.forEach(dong => {
+      const tr = document.createElement('tr');
+      
+      // Check if data is unknown (-1)
+      const isUnknown = dong.agreedRate === -1;
+      const displayRate = isUnknown ? 0 : dong.agreedRate;
+      const displayText = isUnknown ? '? %' : dong.agreedRate.toFixed(1) + '%';
+      
+      // Color based on rate
+      let barColor = 'bg-secondary'; // for unknown
+      let textColor = '#212529';
+      
+      if (!isUnknown) {
+        if (displayRate <= 30) {
+          barColor = 'bg-danger'; // 빨강
+          textColor = '#212529'; // 최저 구간은 검정
+        } else if (displayRate <= 80) {
+          barColor = 'bg-warning'; // 노랑
+          textColor = '#fff'; // 그 이상부터 흰색
+        } else {
+          barColor = 'bg-primary'; // 파랑
+          textColor = '#fff'; // 그 이상부터 흰색
+        }
+      }
+      
+      tr.innerHTML = `
+        <td>${dong.name}</td>
+        <td>${dong.totalUnits}</td>
+        <td>${isUnknown ? '?' : dong.agreedUnits}</td>
+        <td>
+          <div class="progress" style="height: 24px; position: relative; background-color: #dee2e6;">
+            <div class="progress-bar ${barColor}" role="progressbar" style="width: ${displayRate}%;" aria-valuenow="${displayRate}" aria-valuemin="0" aria-valuemax="100"></div>
+            <span class="position-absolute w-100 text-center fw-bold" style="line-height: 24px; color: ${textColor};">${displayText}</span>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+}
+

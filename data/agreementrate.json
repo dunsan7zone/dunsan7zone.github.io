@@ -1,0 +1,46 @@
+{
+  "buildings": [
+    {
+      "name": "향촌 아파트",
+      "totalUnits": 1650,
+      "agreedUnits": 0,
+      "agreedRate": -1,
+      "dongs": [
+        { "name": "향촌 101동", "totalUnits": 60, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 102동", "totalUnits": 60, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 103동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 104동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 105동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 106동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 107동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 108동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 109동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 110동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 111동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 112동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 113동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 114동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 115동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 116동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 117동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 118동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "향촌 119동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 }
+      ]
+    },
+    {
+      "name": "파랑새 아파트",
+      "totalUnits": 406,
+      "agreedUnits": 0,
+      "agreedRate": -1,
+      "dongs": [
+        { "name": "파랑새 101동", "totalUnits": 120, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "파랑새 102동", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "파랑새 103동", "totalUnits": 84, "agreedUnits": 0, "agreedRate": -1 },
+        { "name": "파랑새 104동", "totalUnits": 112, "agreedUnits": 0, "agreedRate": -1 }
+      ]
+    }
+  ],
+  "overallRate": 40.0,
+  "lastUpdated": "2026-03-04"
+}
+
