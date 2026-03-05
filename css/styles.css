@@ -12307,6 +12307,11 @@ footer a:hover, footer a:active, footer a:focus {
   padding-top: 1rem;
 }
 
+/* Parangsae chart card height adjustment */
+.row > .col-12.col-lg-4 .card {
+  min-height: 512.8px;
+}
+
 @media (min-width: 992px) {
   .agreement-split-col {
     border-top: 0;
