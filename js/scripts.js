@@ -475,6 +475,11 @@ function renderAgreementRate() {
   if (homeAgreementRateProgressBar) {
     homeAgreementRateProgressBar.style.width = data.overallRate + '%';
     homeAgreementRateProgressBar.setAttribute('aria-valuenow', data.overallRate);
+    // Apply color based on agreement rate
+    homeAgreementRateProgressBar.style.backgroundColor = getAgreementChartColor(data.overallRate);
+    // Remove all bootstrap color classes and apply appropriate one
+    homeAgreementRateProgressBar.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-primary', 'bg-secondary');
+    homeAgreementRateProgressBar.classList.add(getAgreementProgressClass(data.overallRate));
   }
 
   const buildingUnitSummary = document.getElementById('buildingUnitSummary');

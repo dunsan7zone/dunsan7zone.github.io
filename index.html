@@ -79,46 +79,46 @@
                         
                         <!-- Action Buttons Section -->
                         <div class="mt-2 pt-2 border-top">
-                            <h6 class="mb-4 fw-bold">빠른 연결</h6>
+                            <h6 class="mb-4 fw-bold d-flex align-items-center gap-2">
+                                <i class="bi bi-link"></i>바로가기
+                            </h6>
                             <div class="row g-2">
                                 <div class="col-12 col-md-12">
-                                    <a href="#agreementrate" data-val="agreementrate" class="btn btn-custom-agreement w-100 d-flex flex-column align-items-center justify-content-center gap-3 p-4">
-                                        <div class="d-flex align-items-center justify-content-center gap-2 w-100">
+                                    <a href="#agreementrate" data-val="agreementrate" class="btn btn-custom-agreement w-100 d-flex flex-row align-items-center justify-content-between gap-4 px-4 py-2">
+                                        <div class="d-flex flex-column align-items-center gap-2">
                                             <i class="bi bi-graph-up" style="font-size: 2.5rem;"></i>
-                                            <div class="fw-bold">동의율 현황</div>
+                                            <div class="fw-bold text-center">동의율<br>현황</div>
                                         </div>
-                                        <div class="d-flex align-items-center gap-3 w-100">
-                                            <div class="flex-grow-1">
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-success" id="homeAgreementRateProgressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
+                                        <div class="d-flex flex-column align-items-center gap-2 flex-grow-1">
+                                            <div class="text-center">
+                                                <span id="homeAgreementRateDisplay" class="fw-bold blinking-percentage" style="font-size: 3.5rem; color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); box-shadow: 0 8px 30px rgba(255, 152, 0, 0.6); display: inline-block;">--</span>
                                             </div>
-                                            <div class="text-end">
-                                                <span id="homeAgreementRateDisplay" class="fw-bold" style="font-size: 1.3rem;">--</span>
+                                            <div class="progress w-100" style="height: 20px;">
+                                                <div class="progress-bar" id="homeAgreementRateProgressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                                             </div>
                                         </div>
                                     </a>
                                 </div>
                                 <div class="col-6 col-md-6">
-                                    <a href="#agreedoc" data-val="agreedoc" class="btn btn-custom-purple w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-3">
+                                    <a href="#agreedoc" data-val="agreedoc" class="btn btn-custom-purple w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-1">
                                         <i class="bi bi-file-earmark-text" style="font-size: 2.5rem;"></i>
                                         <span class="text-center">동의서 작성 방법<br>바로가기</span>
                                     </a>
                                 </div>
                                 <div class="col-6 col-md-6">
-                                    <a href="https://open.kakao.com/o/gM6Uv6fi" class="btn btn-custom-kakao w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-3">
+                                    <a href="https://open.kakao.com/o/gM6Uv6fi" class="btn btn-custom-kakao w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-1">
                                         <i class="bi bi-chat-dots-fill" style="font-size: 2.5rem;"></i>
                                         <span class="text-center">둔산지구 7구역<br>카톡 오픈채팅방</span>
                                     </a>
                                 </div>
                                 <div class="col-6 col-md-6">
-                                    <a href="tel:010-5145-2226" class="btn btn-custom-phone w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-3">
+                                    <a href="tel:010-5145-2226" class="btn btn-custom-phone w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-1">
                                         <i class="bi bi-telephone-fill" style="font-size: 2.5rem;"></i>
                                         <span class="text-center">사무실<br>전화걸기</span>
                                     </a>
                                 </div>
                                 <div class="col-6 col-md-6">
-                                    <a href="tel:010-6404-2226" class="btn btn-custom-phone w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-3">
+                                    <a href="tel:010-6404-2226" class="btn btn-custom-phone w-100 d-flex flex-column align-items-center justify-content-center gap-2 py-1">
                                         <i class="bi bi-telephone-fill" style="font-size: 2.5rem;"></i>
                                         <span class="text-center">추진준비위원장<br>전화걸기</span>
                                     </a>

@@ -11496,6 +11496,33 @@ footer a:hover, footer a:active, footer a:focus {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
+/* Blinking Animation for Percentage */
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(255, 152, 0, 0.6);
+  }
+}
+
+.blinking-percentage {
+  animation: blink 1.5s ease-in-out infinite, pulse-glow 1.5s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
 /* Modern Notice Card Styles */
 .notice-card {
   display: flex;
