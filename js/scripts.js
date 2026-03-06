@@ -171,6 +171,9 @@ window.addEventListener('DOMContentLoaded', event => {
   
   // load agreement rate data
   loadAgreementRate();
+  
+  // load activities data
+  loadActivities();
 });
 
 /**
@@ -471,6 +474,12 @@ function renderAgreementRate() {
   const homeAgreementRateProgressBar = document.getElementById('homeAgreementRateProgressBar');
   if (homeAgreementRateDisplay) {
     homeAgreementRateDisplay.textContent = data.overallRate.toFixed(1) + '%';
+    homeAgreementRateDisplay.style.color = '#E12727';
+    homeAgreementRateDisplay.style.textShadow = 'none';
+    homeAgreementRateDisplay.style.webkitTextStroke = '4px #ffffff';
+    homeAgreementRateDisplay.style.paintOrder = 'stroke fill';
+    homeAgreementRateDisplay.style.zIndex = '10';
+    homeAgreementRateDisplay.style.fontWeight = '900';
   }
   if (homeAgreementRateProgressBar) {
     homeAgreementRateProgressBar.style.width = data.overallRate + '%';
@@ -909,4 +918,234 @@ function renderAgreementTable() {
   appendDongRows(hyangchonTbody, hyangchon && hyangchon.dongs);
   appendDongRows(parangsaeTbody, parangsae && parangsae.dongs);
 }
+
+/**
+ * Load and display activities from CSV
+ */
+function loadActivities(csvPath = 'data/activities.csv') {
+  const container = document.getElementById('activitiesContainer');
+  if (!container) return;
+
+  fetch(appendVersion(csvPath))
+    .then(response => response.text())
+    .then(csvData => {
+      const rows = csvData.trim().split('\n').map(r => r.trim()).filter(r => r);
+      if (rows.length === 0) return;
+
+      // Skip header row
+      const dataRows = rows.slice(1);
+      
+      // Clear container
+      container.innerHTML = '';
+
+      // Show empty state message if no data
+      if (dataRows.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;"><i class="bi bi-inbox" style="font-size: 3rem; color: #999; display: block; margin-bottom: 15px;"></i><p style="color: #999; font-size: 1rem;">등록된 활동 내역이 없습니다.</p></div>';
+        return;
+      }
+
+      // Parse and render each activity
+      dataRows.forEach((row, index) => {
+        const cols = row.split(',').map(c => c.trim());
+        const rawImageField = cols[3] || '';
+        const activityImages = rawImageField
+          .split('|')
+          .map(img => img.trim())
+          .filter(img => img.length > 0)
+          .map(img => (img.includes('/') || img.includes('\\')) ? img : `activity_img/${img}`);
+
+        const activityData = {
+          id: cols[0] || index + 1,
+          title: cols[1] || '',
+          date: cols[2] || '',
+          images: activityImages
+        };
+
+        if (!activityData.title) return;
+
+        // Create card
+        const cardCol = document.createElement('div');
+        cardCol.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+
+        const card = document.createElement('div');
+        card.className = 'activity-card';
+        card.onclick = () => openActivityModal(activityData);
+
+        // Card image
+        const cardImg = document.createElement('div');
+        cardImg.className = 'activity-card-img';
+        if (activityData.images.length > 0) {
+          cardImg.style.backgroundImage = `url('${activityData.images[0]}')`;
+        } else {
+          cardImg.style.backgroundColor = '#e9ecef';
+          cardImg.innerHTML = '<i class="bi bi-image" style="font-size: 3rem; color: #6c757d;"></i>';
+        }
+        card.appendChild(cardImg);
+
+        // Card body
+        const cardBody = document.createElement('div');
+        cardBody.className = 'activity-card-body';
+
+        const cardTitle = document.createElement('h5');
+        cardTitle.className = 'activity-card-title';
+        cardTitle.textContent = activityData.title;
+        cardBody.appendChild(cardTitle);
+
+        const cardDate = document.createElement('p');
+        cardDate.className = 'activity-card-date';
+        cardDate.textContent = activityData.date;
+        cardBody.appendChild(cardDate);
+
+        if (activityData.images.length > 1) {
+          const cardBadge = document.createElement('span');
+          cardBadge.className = 'activity-card-badge';
+          cardBadge.innerHTML = `<i class="bi bi-images"></i> ${activityData.images.length}`;
+          cardBody.appendChild(cardBadge);
+        }
+
+        card.appendChild(cardBody);
+        cardCol.appendChild(card);
+        container.appendChild(cardCol);
+      });
+    })
+    .catch(err => {
+      console.error('Error loading activities:', err);
+      container.innerHTML = '<p class="text-center text-muted">활동 내역을 불러올 수 없습니다.</p>';
+    });
+}
+
+/**
+ * Open activity modal with details
+ */
+let currentActivityImages = [];
+let currentImageIndex = 0;
+
+function openActivityModal(activityData) {
+  const modal = document.getElementById('activityModal');
+  const modalTitle = document.getElementById('activityModalTitle');
+  const modalDate = document.getElementById('activityModalDate');
+  const modalDescription = document.getElementById('activityModalDescription');
+  const galleryImages = document.getElementById('galleryImages');
+  const galleryIndicators = document.getElementById('galleryIndicators');
+
+  if (!modal) return;
+
+  // Set data
+  modalTitle.textContent = activityData.title;
+  modalDate.textContent = activityData.date;
+  modalDescription.textContent = activityData.title; // CSV has only title, using it as description
+
+  // Setup images
+  currentActivityImages = activityData.images;
+  currentImageIndex = 0;
+
+  // Clear and render gallery
+  galleryImages.innerHTML = '';
+  galleryIndicators.innerHTML = '';
+
+  if (currentActivityImages.length > 0) {
+    currentActivityImages.forEach((imgSrc, index) => {
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      img.alt = `${activityData.title} 이미지 ${index + 1}`;
+      img.className = 'gallery-image' + (index === 0 ? ' active' : '');
+      galleryImages.appendChild(img);
+
+      // Indicator
+      const indicator = document.createElement('span');
+      indicator.className = 'gallery-indicator' + (index === 0 ? ' active' : '');
+      indicator.onclick = () => showImage(index);
+      galleryIndicators.appendChild(indicator);
+    });
+
+    // Show/hide navigation buttons
+    const prevBtn = document.getElementById('galleryPrev');
+    const nextBtn = document.getElementById('galleryNext');
+    if (currentActivityImages.length > 1) {
+      prevBtn.style.display = 'flex';
+      nextBtn.style.display = 'flex';
+    } else {
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+    }
+  }
+
+  // Show modal
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeActivityModal() {
+  const modal = document.getElementById('activityModal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+function showImage(index) {
+  if (index < 0 || index >= currentActivityImages.length) return;
+
+  const images = document.querySelectorAll('.gallery-image');
+  const indicators = document.querySelectorAll('.gallery-indicator');
+
+  images[currentImageIndex]?.classList.remove('active');
+  indicators[currentImageIndex]?.classList.remove('active');
+
+  currentImageIndex = index;
+
+  images[currentImageIndex]?.classList.add('active');
+  indicators[currentImageIndex]?.classList.add('active');
+}
+
+function nextImage() {
+  const nextIndex = (currentImageIndex + 1) % currentActivityImages.length;
+  showImage(nextIndex);
+}
+
+function prevImage() {
+  const prevIndex = (currentImageIndex - 1 + currentActivityImages.length) % currentActivityImages.length;
+  showImage(prevIndex);
+}
+
+// Setup modal event listeners
+window.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('activityModal');
+  const closeBtn = document.querySelector('.activity-modal-close');
+  const prevBtn = document.getElementById('galleryPrev');
+  const nextBtn = document.getElementById('galleryNext');
+
+  if (closeBtn) {
+    closeBtn.onclick = closeActivityModal;
+  }
+
+  if (modal) {
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeActivityModal();
+      }
+    };
+  }
+
+  if (prevBtn) {
+    prevBtn.onclick = prevImage;
+  }
+
+  if (nextBtn) {
+    nextBtn.onclick = nextImage;
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (modal && modal.style.display === 'flex') {
+      if (e.key === 'Escape') {
+        closeActivityModal();
+      } else if (e.key === 'ArrowLeft') {
+        prevImage();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      }
+    }
+  });
+});
 
