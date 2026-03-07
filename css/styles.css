@@ -11506,6 +11506,14 @@ footer a:hover, footer a:active, footer a:focus {
 }
 
 .btn-custom-phone {
+  background-color: #206f81 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-custom-phone2 {
   background-color: #198754 !important;
   color: #ffffff !important;
   border: none !important;
@@ -11515,6 +11523,21 @@ footer a:hover, footer a:active, footer a:focus {
 
 .btn-custom-phone:hover {
   background-color: #157347 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-custom-youtube {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-custom-youtube:hover {
+  background-color: #cc0000 !important;
   color: #ffffff !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -12437,6 +12460,12 @@ footer a:hover, footer a:active, footer a:focus {
   justify-content: center;
 }
 
+.activity-card-video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .activity-card-body {
   padding: 16px;
   flex: 1;
@@ -12596,6 +12625,24 @@ footer a:hover, footer a:active, footer a:focus {
 .gallery-image.active {
   display: block;
   animation: fadeInImage 0.3s ease;
+}
+
+.gallery-media-item {
+  display: none;
+}
+
+.gallery-media-item.active {
+  display: block;
+  animation: fadeInImage 0.3s ease;
+}
+
+.gallery-video {
+  width: min(100%, 420px);
+  aspect-ratio: 9 / 16;
+  border: 0;
+  border-radius: 8px;
+  background: #000;
+  margin: 0 auto;
 }
 
 @keyframes fadeInImage {

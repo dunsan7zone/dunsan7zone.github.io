@@ -922,6 +922,104 @@ function renderAgreementTable() {
 /**
  * Load and display activities from CSV
  */
+function getYouTubeVideoId(url) {
+  if (!url) return null;
+
+  const normalized = String(url).trim();
+  if (!/^https?:\/\//i.test(normalized)) return null;
+
+  const shortsMatch = normalized.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/i);
+  if (shortsMatch) return shortsMatch[1];
+
+  const shortLinkMatch = normalized.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/i);
+  if (shortLinkMatch) return shortLinkMatch[1];
+
+  try {
+    const parsed = new URL(normalized);
+    const watchId = parsed.searchParams.get('v');
+    if (watchId) return watchId;
+  } catch (err) {
+    return null;
+  }
+
+  return null;
+}
+
+function parseActivityMedia(rawMediaField) {
+  return rawMediaField
+    .split('|')
+    .map(item => item.trim())
+    .filter(item => item.length > 0)
+    .map(item => {
+      const youtubeId = getYouTubeVideoId(item);
+      if (youtubeId) {
+        return {
+          type: 'youtube',
+          source: item,
+          videoId: youtubeId,
+          embedUrl: `https://www.youtube.com/embed/${youtubeId}`,
+          thumbnailUrl: `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+        };
+      }
+
+      return {
+        type: 'image',
+        source: (item.includes('/') || item.includes('\\')) ? item : `activity_img/${item}`
+      };
+    });
+}
+
+function buildYouTubeEmbedUrl(baseEmbedUrl, options = {}) {
+  const autoplay = options.autoplay ? '1' : '0';
+  const mute = options.mute ? '1' : '0';
+  return `${baseEmbedUrl}?rel=0&autoplay=${autoplay}&mute=${mute}&playsinline=1&enablejsapi=1`;
+}
+
+function setYouTubeIframeVolume(iframe, volume = 50) {
+  if (!iframe || iframe.tagName !== 'IFRAME') return;
+
+  const applyVolume = () => {
+    iframe.contentWindow?.postMessage(
+      JSON.stringify({ event: 'command', func: 'unMute', args: [] }),
+      'https://www.youtube.com'
+    );
+    iframe.contentWindow?.postMessage(
+      JSON.stringify({ event: 'command', func: 'setVolume', args: [volume] }),
+      'https://www.youtube.com'
+    );
+  };
+
+  // Retry briefly because player readiness timing varies by browser/network.
+  setTimeout(applyVolume, 300);
+  setTimeout(applyVolume, 900);
+}
+
+function syncGalleryYouTubePlayback() {
+  const mediaItems = document.querySelectorAll('.gallery-media-item');
+
+  mediaItems.forEach((item, index) => {
+    if (item.tagName !== 'IFRAME') return;
+
+    const baseEmbedUrl = item.dataset.embedBase;
+    if (!baseEmbedUrl) return;
+
+    const shouldAutoplay = index === currentImageIndex;
+      const desiredSrc = buildYouTubeEmbedUrl(baseEmbedUrl, {
+        autoplay: shouldAutoplay,
+        mute: false
+    });
+
+    if (item.src !== desiredSrc) {
+      item.src = desiredSrc;
+      if (shouldAutoplay) {
+        setYouTubeIframeVolume(item, 50);
+      }
+    } else if (shouldAutoplay) {
+      setYouTubeIframeVolume(item, 50);
+    }
+  });
+}
+
 function loadActivities(csvPath = 'data/activities.csv') {
   const container = document.getElementById('activitiesContainer');
   if (!container) return;
@@ -944,20 +1042,26 @@ function loadActivities(csvPath = 'data/activities.csv') {
         return;
       }
 
-      // Parse and render each activity
-      dataRows.forEach((row, index) => {
+      const sortedRows = [...dataRows].sort((a, b) => {
+        const aId = Number((a.split(',')[0] || '').trim());
+        const bId = Number((b.split(',')[0] || '').trim());
+        return bId - aId;
+      });
+
+      // Parse and render each activity (latest first)
+      sortedRows.forEach((row, index) => {
         const cols = row.split(',').map(c => c.trim());
-        const rawImageField = cols[3] || '';
-        const activityImages = rawImageField
-          .split('|')
-          .map(img => img.trim())
-          .filter(img => img.length > 0)
-          .map(img => (img.includes('/') || img.includes('\\')) ? img : `activity_img/${img}`);
+        const rawMediaField = cols[3] || '';
+        const activityMedia = parseActivityMedia(rawMediaField);
+        const activityImages = activityMedia
+          .filter(media => media.type === 'image')
+          .map(media => media.source);
 
         const activityData = {
           id: cols[0] || index + 1,
           title: cols[1] || '',
           date: cols[2] || '',
+          media: activityMedia,
           images: activityImages
         };
 
@@ -974,8 +1078,14 @@ function loadActivities(csvPath = 'data/activities.csv') {
         // Card image
         const cardImg = document.createElement('div');
         cardImg.className = 'activity-card-img';
-        if (activityData.images.length > 0) {
-          cardImg.style.backgroundImage = `url('${activityData.images[0]}')`;
+        const primaryMedia = activityData.media[0];
+        if (primaryMedia) {
+          if (primaryMedia.type === 'youtube') {
+            cardImg.style.backgroundImage = `url('${primaryMedia.thumbnailUrl}')`;
+            cardImg.innerHTML = '<i class="bi bi-play-circle-fill" style="font-size: 3.5rem; color: #ffffff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);"></i>';
+          } else {
+            cardImg.style.backgroundImage = `url('${primaryMedia.source}')`;
+          }
         } else {
           cardImg.style.backgroundColor = '#e9ecef';
           cardImg.innerHTML = '<i class="bi bi-image" style="font-size: 3rem; color: #6c757d;"></i>';
@@ -996,10 +1106,10 @@ function loadActivities(csvPath = 'data/activities.csv') {
         cardDate.textContent = activityData.date;
         cardBody.appendChild(cardDate);
 
-        if (activityData.images.length > 1) {
+        if (activityData.media.length > 1) {
           const cardBadge = document.createElement('span');
           cardBadge.className = 'activity-card-badge';
-          cardBadge.innerHTML = `<i class="bi bi-images"></i> ${activityData.images.length}`;
+          cardBadge.innerHTML = `<i class="bi bi-collection-play"></i> ${activityData.media.length}`;
           cardBody.appendChild(cardBadge);
         }
 
@@ -1035,8 +1145,10 @@ function openActivityModal(activityData) {
   modalDate.textContent = activityData.date;
   modalDescription.textContent = activityData.title; // CSV has only title, using it as description
 
-  // Setup images
-  currentActivityImages = activityData.images;
+  // Setup media
+  currentActivityImages = (activityData.media && activityData.media.length > 0)
+    ? activityData.media
+    : (activityData.images || []).map(img => ({ type: 'image', source: img }));
   currentImageIndex = 0;
 
   // Clear and render gallery
@@ -1044,12 +1156,28 @@ function openActivityModal(activityData) {
   galleryIndicators.innerHTML = '';
 
   if (currentActivityImages.length > 0) {
-    currentActivityImages.forEach((imgSrc, index) => {
-      const img = document.createElement('img');
-      img.src = imgSrc;
-      img.alt = `${activityData.title} 이미지 ${index + 1}`;
-      img.className = 'gallery-image' + (index === 0 ? ' active' : '');
-      galleryImages.appendChild(img);
+    currentActivityImages.forEach((media, index) => {
+      if (media.type === 'youtube') {
+        const iframe = document.createElement('iframe');
+        iframe.dataset.embedBase = media.embedUrl;
+        iframe.src = buildYouTubeEmbedUrl(media.embedUrl, {
+          autoplay: index === 0,
+          mute: false
+        });
+        iframe.title = `${activityData.title} 영상 ${index + 1}`;
+        iframe.className = 'gallery-media-item gallery-video' + (index === 0 ? ' active' : '');
+        iframe.loading = 'lazy';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        iframe.addEventListener('load', () => setYouTubeIframeVolume(iframe, 50));
+        galleryImages.appendChild(iframe);
+      } else {
+        const img = document.createElement('img');
+        img.src = media.source;
+        img.alt = `${activityData.title} 이미지 ${index + 1}`;
+        img.className = 'gallery-media-item gallery-image' + (index === 0 ? ' active' : '');
+        galleryImages.appendChild(img);
+      }
 
       // Indicator
       const indicator = document.createElement('span');
@@ -1068,6 +1196,9 @@ function openActivityModal(activityData) {
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
     }
+
+    // Ensure only the current item is playing.
+    syncGalleryYouTubePlayback();
   }
 
   // Show modal
@@ -1077,16 +1208,27 @@ function openActivityModal(activityData) {
 
 function closeActivityModal() {
   const modal = document.getElementById('activityModal');
+  const galleryImages = document.getElementById('galleryImages');
+  const galleryIndicators = document.getElementById('galleryIndicators');
+
   if (modal) {
     modal.style.display = 'none';
     document.body.style.overflow = '';
+  }
+
+  // Clear media so embedded videos stop when modal closes
+  if (galleryImages) {
+    galleryImages.innerHTML = '';
+  }
+  if (galleryIndicators) {
+    galleryIndicators.innerHTML = '';
   }
 }
 
 function showImage(index) {
   if (index < 0 || index >= currentActivityImages.length) return;
 
-  const images = document.querySelectorAll('.gallery-image');
+  const images = document.querySelectorAll('.gallery-media-item');
   const indicators = document.querySelectorAll('.gallery-indicator');
 
   images[currentImageIndex]?.classList.remove('active');
@@ -1096,14 +1238,17 @@ function showImage(index) {
 
   images[currentImageIndex]?.classList.add('active');
   indicators[currentImageIndex]?.classList.add('active');
+  syncGalleryYouTubePlayback();
 }
 
 function nextImage() {
+  if (currentActivityImages.length === 0) return;
   const nextIndex = (currentImageIndex + 1) % currentActivityImages.length;
   showImage(nextIndex);
 }
 
 function prevImage() {
+  if (currentActivityImages.length === 0) return;
   const prevIndex = (currentImageIndex - 1 + currentActivityImages.length) % currentActivityImages.length;
   showImage(prevIndex);
 }
