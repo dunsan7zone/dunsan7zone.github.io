@@ -15,6 +15,20 @@ function appendVersion(url) {
   return `${url}${separator}v=${encodeURIComponent(APP_VERSION)}`;
 }
 
+function appendVersionForLocalAsset(url) {
+  if (!url) return url;
+
+  const normalized = String(url).trim();
+  if (!normalized) return normalized;
+
+  // Keep external/data/blob URLs untouched.
+  if (/^(https?:)?\/\//i.test(normalized) || /^data:|^blob:/i.test(normalized)) {
+    return normalized;
+  }
+
+  return appendVersion(normalized);
+}
+
 function showSection(targetId) {
     // collect all sections each time in case DOM changes
     const sections = document.querySelectorAll('.page-section');
@@ -1024,8 +1038,13 @@ function loadActivities(csvPath = 'data/activities.csv') {
   const container = document.getElementById('activitiesContainer');
   if (!container) return;
 
-  fetch(appendVersion(csvPath))
-    .then(response => response.text())
+  fetch(appendVersion(csvPath), { cache: 'no-store' })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
     .then(csvData => {
       const rows = csvData.trim().split('\n').map(r => r.trim()).filter(r => r);
       if (rows.length === 0) return;
@@ -1084,7 +1103,8 @@ function loadActivities(csvPath = 'data/activities.csv') {
             cardImg.style.backgroundImage = `url('${primaryMedia.thumbnailUrl}')`;
             cardImg.innerHTML = '<i class="bi bi-play-circle-fill" style="font-size: 3.5rem; color: #ffffff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);"></i>';
           } else {
-            cardImg.style.backgroundImage = `url('${primaryMedia.source}')`;
+            const imageUrl = appendVersionForLocalAsset(primaryMedia.source);
+            cardImg.style.backgroundImage = `url('${imageUrl}')`;
           }
         } else {
           cardImg.style.backgroundColor = '#e9ecef';
@@ -1173,7 +1193,7 @@ function openActivityModal(activityData) {
         galleryImages.appendChild(iframe);
       } else {
         const img = document.createElement('img');
-        img.src = media.source;
+        img.src = appendVersionForLocalAsset(media.source);
         img.alt = `${activityData.title} 이미지 ${index + 1}`;
         img.className = 'gallery-media-item gallery-image' + (index === 0 ? ' active' : '');
         galleryImages.appendChild(img);
