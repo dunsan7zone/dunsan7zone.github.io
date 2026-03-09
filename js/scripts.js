@@ -64,6 +64,27 @@ window.addEventListener('DOMContentLoaded', event => {
       });
   };
 
+  // Enable smooth horizontal scrolling for mobile menu
+  const navbarResponsive = document.querySelector('#navbarResponsive');
+  const navbarNav = document.querySelector('#navbarResponsive .navbar-nav');
+  
+  if (navbarResponsive && navbarNav) {
+    // Force scrollable state when menu is shown
+    navbarResponsive.addEventListener('shown.bs.collapse', function () {
+      // Force horizontal scroll
+      navbarNav.style.overflowX = 'scroll';
+      navbarNav.style.flexWrap = 'nowrap';
+      navbarNav.style.display = 'flex';
+    });
+    
+    // Also apply immediately if already shown
+    if (navbarResponsive.classList.contains('show')) {
+      navbarNav.style.overflowX = 'scroll';
+      navbarNav.style.flexWrap = 'nowrap';
+      navbarNav.style.display = 'flex';
+    }
+  }
+
   // Collapse responsive navbar when toggler is visible
   const navbarToggler = document.body.querySelector('.navbar-toggler');
   const responsiveNavItems = [].slice.call(
