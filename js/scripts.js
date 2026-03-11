@@ -507,6 +507,7 @@ function renderAgreementRate() {
   // Update home button agreement rate display with progress bar
   const homeAgreementRateDisplay = document.getElementById('homeAgreementRateDisplay');
   const homeAgreementRateProgressBar = document.getElementById('homeAgreementRateProgressBar');
+  const homeAgreementRateDate = document.getElementById('homeAgreementRateDate');
   if (homeAgreementRateDisplay) {
     homeAgreementRateDisplay.textContent = data.overallRate.toFixed(1) + '%';
     homeAgreementRateDisplay.style.color = '#E12727';
@@ -515,6 +516,10 @@ function renderAgreementRate() {
     homeAgreementRateDisplay.style.paintOrder = 'stroke fill';
     homeAgreementRateDisplay.style.zIndex = '10';
     homeAgreementRateDisplay.style.fontWeight = '900';
+  }
+  if (homeAgreementRateDate) {
+    const dateText = data.lastUpdated ? data.lastUpdated : '--';
+    homeAgreementRateDate.textContent = `기준날짜: ${dateText}`;
   }
   if (homeAgreementRateProgressBar) {
     homeAgreementRateProgressBar.style.width = data.overallRate + '%';
