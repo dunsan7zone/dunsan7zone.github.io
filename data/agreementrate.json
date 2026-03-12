@@ -30,17 +30,17 @@
     {
       "name": "파랑새 아파트",
       "totalUnits": 406,
-      "agreedUnits": 0,
-      "agreedRate": -1,
+      "agreedUnits": 232,
+      "agreedRate": 57,
       "dongs": [
-        { "name": "101", "totalUnits": 120, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "102", "totalUnits": 90, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "103", "totalUnits": 84, "agreedUnits": 0, "agreedRate": -1 },
-        { "name": "104", "totalUnits": 112, "agreedUnits": 0, "agreedRate": -1 }
+        { "name": "101", "totalUnits": 120, "agreedUnits": 73, "agreedRate": 61 },
+        { "name": "102", "totalUnits": 90, "agreedUnits": 50, "agreedRate": 56 },
+        { "name": "103", "totalUnits": 84, "agreedUnits": 53, "agreedRate": 63 },
+        { "name": "104", "totalUnits": 112, "agreedUnits": 56, "agreedRate": 50 }
       ]
     }
   ],
-  "overallRate": 51.5,
-  "lastUpdated": "2026-03-11"
+  "overallRate": 60,
+  "lastUpdated": "2026-03-12"
 }
 
