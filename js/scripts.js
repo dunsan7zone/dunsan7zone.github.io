@@ -53,6 +53,26 @@ function showSection(targetId) {
     }
   }
 
+function resolveSectionRequest(targetId) {
+  const fallbackId = 'home';
+  const blockedSections = new Set(['agreementrate']);
+  const normalizedId = String(targetId || '').trim();
+
+  if (!normalizedId) {
+    return { resolvedId: fallbackId, blocked: false, missing: false };
+  }
+
+  if (blockedSections.has(normalizedId)) {
+    return { resolvedId: fallbackId, blocked: true, missing: false };
+  }
+
+  if (!document.getElementById(normalizedId)) {
+    return { resolvedId: fallbackId, blocked: false, missing: true };
+  }
+
+  return { resolvedId: normalizedId, blocked: false, missing: false };
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
   // Activate Bootstrap scrollspy on the main nav element
@@ -109,9 +129,10 @@ window.addEventListener('DOMContentLoaded', event => {
         targetId = '';
       }
       if (targetId) {
-        showSection(targetId);
+        const { resolvedId } = resolveSectionRequest(targetId);
+        showSection(resolvedId);
         // update hash so it persists across refresh
-        history.pushState(null, '', '#' + targetId);
+        history.pushState(null, '', '#' + resolvedId);
       }
       // update active class on links
       navLinks.forEach(l => l.classList.remove('active'));
@@ -136,13 +157,14 @@ window.addEventListener('DOMContentLoaded', event => {
       e.preventDefault();
       const targetId = link.dataset.val;
       if (targetId) {
-        showSection(targetId);
-        history.pushState(null, '', '#' + targetId);
+        const { resolvedId } = resolveSectionRequest(targetId);
+        showSection(resolvedId);
+        history.pushState(null, '', '#' + resolvedId);
         // update active class on nav links if applicable
         navLinks.forEach(l => l.classList.remove('active'));
         navLinks.forEach(l => {
           const val = l.dataset.val || l.getAttribute('href').substring(1);
-          if (val === targetId) l.classList.add('active');
+          if (val === resolvedId) l.classList.add('active');
         });
       }
     });
@@ -153,6 +175,13 @@ window.addEventListener('DOMContentLoaded', event => {
   if (location.hash) {
     initial = location.hash.substring(1);
   }
+  const initialRequest = resolveSectionRequest(initial);
+  initial = initialRequest.resolvedId;
+
+  if ((initialRequest.blocked || initialRequest.missing) && location.hash) {
+    alert('존재하지 않습니다.');
+  }
+
   showSection(initial);
   // record initial state in history
   history.replaceState(null, '', '#' + initial);
@@ -164,13 +193,40 @@ window.addEventListener('DOMContentLoaded', event => {
   
   // handle browser back/forward buttons
   window.addEventListener('popstate', () => {
-    const targetId = location.hash ? location.hash.substring(1) : 'home';
+    const request = resolveSectionRequest(location.hash ? location.hash.substring(1) : 'home');
+
+    if ((request.blocked || request.missing) && location.hash) {
+      alert('존재하지 않습니다.');
+      history.replaceState(null, '', '#home');
+    }
+
+    const targetId = request.resolvedId;
     showSection(targetId);
     // update active class on nav links
     navLinks.forEach(l => l.classList.remove('active'));
     navLinks.forEach(l => {
       const val = l.dataset.val || l.getAttribute('href').substring(1);
       if (val === targetId) l.classList.add('active');
+    });
+  });
+
+  // handle direct hash edits in the address bar without full reload
+  window.addEventListener('hashchange', () => {
+    const request = resolveSectionRequest(location.hash ? location.hash.substring(1) : 'home');
+
+    if (request.blocked || request.missing) {
+      alert('존재하지 않습니다.');
+      showSection('home');
+      navLinks.forEach(l => l.classList.remove('active'));
+      history.replaceState(null, '', '#home');
+      return;
+    }
+
+    showSection(request.resolvedId);
+    navLinks.forEach(l => l.classList.remove('active'));
+    navLinks.forEach(l => {
+      const val = l.dataset.val || l.getAttribute('href').substring(1);
+      if (val === request.resolvedId) l.classList.add('active');
     });
   });
 

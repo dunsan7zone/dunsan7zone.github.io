@@ -11610,6 +11610,13 @@ footer a:hover, footer a:active, footer a:focus {
   transition: all 0.3s ease;
 }
 
+.agreement-status-card {
+  background-color: #FF9800;
+  color: #ffffff;
+  border-radius: var(--bs-border-radius);
+  font-weight: 600;
+}
+
 .btn-custom-agreement:hover {
   background-color: #E68900 !important;
   color: #ffffff !important;
