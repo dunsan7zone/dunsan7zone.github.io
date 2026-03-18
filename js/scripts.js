@@ -395,7 +395,7 @@ window.addEventListener('DOMContentLoaded', event => {
       });
   }
 
-  if (!shouldSkipTimeNoticeModal()) {
+  if (initial === 'home' && !shouldSkipTimeNoticeModal()) {
     showTimeNoticeModalIfNeeded();
   }
 
