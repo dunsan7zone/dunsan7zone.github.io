@@ -181,6 +181,36 @@ async function showTimeNoticeModalIfNeeded(configPath = NOTICE_MODAL_CONFIG_PATH
   modal.show();
 }
 
+function isBackForwardNavigation() {
+  const navEntries = performance.getEntriesByType('navigation');
+  if (Array.isArray(navEntries) && navEntries.length > 0) {
+    return navEntries[0].type === 'back_forward';
+  }
+
+  // Fallback for older browsers using deprecated API.
+  return performance.navigation && performance.navigation.type === 2;
+}
+
+function isReturnFromDetailPage() {
+  if (!document.referrer) return false;
+
+  try {
+    const referrerUrl = new URL(document.referrer);
+    const currentUrl = new URL(location.href);
+
+    if (referrerUrl.origin !== currentUrl.origin) return false;
+
+    const referrerPath = referrerUrl.pathname.toLowerCase();
+    return referrerPath.endsWith('/detail.html') || referrerPath.endsWith('detail.html');
+  } catch (err) {
+    return false;
+  }
+}
+
+function shouldSkipTimeNoticeModal() {
+  return isBackForwardNavigation() || isReturnFromDetailPage();
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
   // Activate Bootstrap scrollspy on the main nav element
@@ -365,7 +395,9 @@ window.addEventListener('DOMContentLoaded', event => {
       });
   }
 
-  showTimeNoticeModalIfNeeded();
+  if (!shouldSkipTimeNoticeModal()) {
+    showTimeNoticeModalIfNeeded();
+  }
 
   // load board data from CSV
   loadBoard();

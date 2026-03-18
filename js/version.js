@@ -1,1 +1,1 @@
-window.APP_VERSION = '20260318-3';
+window.APP_VERSION = '20260318-4';
