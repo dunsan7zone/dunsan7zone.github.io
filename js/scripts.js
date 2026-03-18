@@ -73,6 +73,114 @@ function resolveSectionRequest(targetId) {
   return { resolvedId: normalizedId, blocked: false, missing: false };
 }
 
+const NOTICE_MODAL_CONFIG_PATH = 'data/modal-notice.json';
+
+function parseNoticeDate(dateText) {
+  if (typeof dateText !== 'string' || !dateText.trim()) return null;
+  const parsed = new Date(dateText);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+function normalizeNoticeModalConfig(rawConfig) {
+  if (!rawConfig || typeof rawConfig !== 'object') return null;
+
+  const sessionKey =
+    typeof rawConfig.sessionKey === 'string' && rawConfig.sessionKey.trim()
+      ? rawConfig.sessionKey.trim()
+      : 'time-notice-modal-shown';
+
+  return {
+    enabled: rawConfig.enabled !== false,
+    title:
+      typeof rawConfig.title === 'string' && rawConfig.title.trim()
+        ? rawConfig.title.trim()
+        : '안내',
+    message: typeof rawConfig.message === 'string' ? rawConfig.message : '',
+    startAt: typeof rawConfig.startAt === 'string' ? rawConfig.startAt : '',
+    endAt: typeof rawConfig.endAt === 'string' ? rawConfig.endAt : '',
+    showOncePerSession: rawConfig.showOncePerSession === true,
+    sessionKey
+  };
+}
+
+function canShowNoticeModalInDateRange(config, now = new Date()) {
+  const startAt = parseNoticeDate(config.startAt);
+  const endAt = parseNoticeDate(config.endAt);
+
+  if (startAt && now < startAt) return false;
+  if (endAt && now > endAt) return false;
+  return true;
+}
+
+function canShowNoticeModalInSession(config) {
+  if (!config.showOncePerSession) return true;
+
+  try {
+    return sessionStorage.getItem(config.sessionKey) !== '1';
+  } catch (err) {
+    return true;
+  }
+}
+
+function markNoticeModalShownInSession(config) {
+  if (!config.showOncePerSession) return;
+
+  try {
+    sessionStorage.setItem(config.sessionKey, '1');
+  } catch (err) {
+    // ignore sessionStorage failures and keep modal behavior intact
+  }
+}
+
+function applyNoticeModalContent(config) {
+  const titleElement = document.getElementById('timeNoticeModalLabel');
+  const bodyElement = document.getElementById('timeNoticeModalBody');
+
+  if (titleElement) {
+    titleElement.textContent = config.title;
+  }
+
+  if (bodyElement) {
+    bodyElement.style.whiteSpace = 'pre-line';
+    bodyElement.textContent = config.message;
+  }
+}
+
+async function loadNoticeModalConfig(configPath = NOTICE_MODAL_CONFIG_PATH) {
+  try {
+    const response = await fetch(appendVersion(configPath), { cache: 'no-store' });
+
+    if (!response.ok) {
+      throw new Error(`Failed to load modal config: ${response.status}`);
+    }
+
+    const rawConfig = await response.json();
+    return normalizeNoticeModalConfig(rawConfig);
+  } catch (err) {
+    console.warn('Notice modal config load failed:', err);
+    return null;
+  }
+}
+
+async function showTimeNoticeModalIfNeeded(configPath = NOTICE_MODAL_CONFIG_PATH) {
+  const modalElement = document.getElementById('timeNoticeModal');
+  if (!modalElement || !window.bootstrap || !bootstrap.Modal) return;
+
+  const config = await loadNoticeModalConfig(configPath);
+  if (!config || !config.enabled) return;
+  if (!canShowNoticeModalInDateRange(config)) return;
+  if (!canShowNoticeModalInSession(config)) return;
+
+  applyNoticeModalContent(config);
+
+  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+  modalElement.addEventListener('hidden.bs.modal', () => {
+    markNoticeModalShownInSession(config);
+  }, { once: true });
+  modal.show();
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
   // Activate Bootstrap scrollspy on the main nav element
@@ -256,6 +364,8 @@ window.addEventListener('DOMContentLoaded', event => {
           ride: 'carousel'
       });
   }
+
+  showTimeNoticeModalIfNeeded();
 
   // load board data from CSV
   loadBoard();
