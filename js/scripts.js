@@ -708,12 +708,6 @@ function renderAgreementRate() {
   const homeAgreementRateDate = document.getElementById('homeAgreementRateDate');
   if (homeAgreementRateDisplay) {
     homeAgreementRateDisplay.textContent = data.overallRate.toFixed(1) + '%';
-    homeAgreementRateDisplay.style.color = '#E12727';
-    homeAgreementRateDisplay.style.textShadow = 'none';
-    homeAgreementRateDisplay.style.webkitTextStroke = '4px #ffffff';
-    homeAgreementRateDisplay.style.paintOrder = 'stroke fill';
-    homeAgreementRateDisplay.style.zIndex = '10';
-    homeAgreementRateDisplay.style.fontWeight = '900';
   }
   if (homeAgreementRateDate) {
     const dateText = data.lastUpdated ? data.lastUpdated : '--';

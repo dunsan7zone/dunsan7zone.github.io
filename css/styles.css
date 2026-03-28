@@ -11577,7 +11577,11 @@ footer a:hover, footer a:active, footer a:focus {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  line-height: 1;
+  min-width: 0;
+  line-height: 1.2;
+  white-space: normal;
+  word-break: keep-all;
+  text-wrap: balance;
 }
 
 .btn-custom-phone:hover {
@@ -11615,6 +11619,43 @@ footer a:hover, footer a:active, footer a:focus {
   color: #ffffff;
   border-radius: var(--bs-border-radius);
   font-weight: 600;
+}
+
+.agreement-status-card > .flex-grow-1 {
+  min-width: 0;
+}
+
+#homeAgreementRateBar {
+  min-width: 0;
+  overflow: hidden;
+}
+
+#homeAgreementRateDisplay {
+  top: 0;
+  padding-inline: 0.35rem;
+  font-size: clamp(1.9rem, 8vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  color: #E12727;
+  text-shadow: none;
+  -webkit-text-stroke: clamp(1.5px, 0.6vw, 4px) #ffffff;
+  paint-order: stroke fill;
+  z-index: 10;
+  font-weight: 900;
+}
+
+@media (max-width: 575.98px) {
+  .agreement-status-card {
+    gap: 0.75rem !important;
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+  }
+
+  #homeAgreementRateDisplay {
+    font-size: clamp(1.55rem, 10vw, 2.5rem);
+    -webkit-text-stroke: clamp(1px, 0.5vw, 2px) #ffffff;
+  }
 }
 
 .btn-custom-agreement:hover {
